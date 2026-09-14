@@ -1,6 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/dal";
 import { logout } from "@/app/actions/auth";
+
+export const metadata: Metadata = {
+  title: "Admin",
+};
 
 const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard" },

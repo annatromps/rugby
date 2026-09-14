@@ -10,8 +10,15 @@ import "./globals.css";
 // typeface later, self-host it with next/font/local instead.
 
 export const metadata: Metadata = {
-  title: "Kickoff Rugby Recruitment Admin",
-  description: "Rugby club and player recruitment platform -- admin tools",
+  title: {
+    default: "Kickoff Rugby Recruitment",
+    template: "%s | Kickoff Rugby Recruitment",
+  },
+  description:
+    "Where rugby players and clubs find each other -- browse players, browse clubs, and connect directly.",
+  icons: {
+    icon: "/kickoff-rugby-logo.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
