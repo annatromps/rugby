@@ -22,10 +22,10 @@ export default async function AdminLayout({
         <aside className="hidden w-56 shrink-0 border-r border-slate-200 bg-white sm:block">
           <div className="flex h-14 items-center gap-2 border-b border-slate-200 px-4">
             <div className="flex h-7 w-7 items-center justify-center rounded-md bg-slate-900 text-xs font-bold text-white">
-              CM
+              KR
             </div>
             <span className="text-sm font-semibold text-slate-900">
-              ClubMatch
+              Kickoff Rugby Recruitment
             </span>
           </div>
           <nav className="flex flex-col gap-0.5 p-3">
@@ -43,7 +43,7 @@ export default async function AdminLayout({
 
         <div className="flex min-h-screen flex-1 flex-col">
           <header className="flex h-14 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-6">
-            <p className="text-sm text-slate-500 sm:hidden">ClubMatch</p>
+            <p className="text-sm text-slate-500 sm:hidden">Kickoff Rugby Recruitment</p>
             <div className="ml-auto flex items-center gap-3">
               <span className="text-sm text-slate-600">{admin.name}</span>
               <form action={logout}>

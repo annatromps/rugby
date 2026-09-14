@@ -1,4 +1,4 @@
-# ClubMatch
+# Kickoff Rugby Recruitment
 
 An internal tool for a rugby recruitment business: a two-sided marketplace connecting rugby clubs (looking for players) with players (looking for a club), plus tracking for accommodation/relocation support once a placement is made.
 

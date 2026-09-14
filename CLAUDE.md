@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# ClubMatch -- project guide for Claude
+# Kickoff Rugby Recruitment -- project guide for Claude
 
 Read `README.md` first for stack, structure, and local setup. This file is the extra context specific to working on this codebase as an AI agent.
 

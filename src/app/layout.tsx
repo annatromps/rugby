@@ -10,7 +10,7 @@ import "./globals.css";
 // typeface later, self-host it with next/font/local instead.
 
 export const metadata: Metadata = {
-  title: "ClubMatch Admin",
+  title: "Kickoff Rugby Recruitment Admin",
   description: "Rugby club and player recruitment platform -- admin tools",
 };
 
