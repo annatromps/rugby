@@ -20,7 +20,7 @@ export default async function ClubProfilePage({
 
   const [club] = await db.select().from(clubs).where(eq(clubs.id, id)).limit(1);
 
-  if (!club || club.source !== "SELF_SUBMITTED" || PUBLIC_EXCLUDED_STATUSES.has(club.status)) {
+  if (!club || club.source !== "SELF_SUBMITTED" || !club.isPublished || PUBLIC_EXCLUDED_STATUSES.has(club.status)) {
     notFound();
   }
 

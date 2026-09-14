@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { players, contactLogs, accommodationRequests, placements, clubs } from "@/lib/db/schema";
 import { logPlayerContact } from "@/app/actions/players";
 import { PlayerStatusSelect } from "@/components/admin/player-status-select";
+import { PlayerPublishToggle } from "@/components/admin/player-publish-toggle";
 import { AddContactLogForm, ContactLogList } from "@/components/admin/contact-log";
 import { PlayerEditForm } from "./player-edit-form";
 import { AccommodationList } from "./accommodation";
@@ -53,7 +54,12 @@ export default async function PlayerDetailPage({
             {player.currentCountry ? ` · based in ${player.currentCountry}` : ""}
           </p>
         </div>
-        <PlayerStatusSelect playerId={player.id} status={player.status} />
+        <div className="flex items-center gap-2">
+          {player.source === "SELF_SUBMITTED" && (
+            <PlayerPublishToggle playerId={player.id} isPublished={player.isPublished} />
+          )}
+          <PlayerStatusSelect playerId={player.id} status={player.status} />
+        </div>
       </div>
 
       <Section title="Details">

@@ -4,10 +4,13 @@
 // sign-up (players/clubs registering themselves) and inquiries sent from a
 // player/club profile page. Nothing here calls requireAdmin() -- these are
 // meant to be reachable by anyone. Submissions land with
-// source: "SELF_SUBMITTED" and status: "NEW" so they show up in the normal
-// admin pipeline (src/app/admin/players, src/app/admin/clubs) for review,
-// and inquiries are written as ordinary contact_logs rows so they show up
-// in the same contact history the admin already sees on a player/club page.
+// source: "SELF_SUBMITTED", status: "NEW", and isPublished: false so they
+// show up in the normal admin pipeline (src/app/admin/players,
+// src/app/admin/clubs) for review, but stay off the public site
+// (src/app/players, src/app/clubs) until a staff member approves and
+// publishes them. Inquiries are written as ordinary contact_logs rows so
+// they show up in the same contact history the admin already sees on a
+// player/club page.
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -66,6 +69,7 @@ export async function submitPlayerApplication(
     ...parsed.data,
     source: "SELF_SUBMITTED",
     status: "NEW",
+    isPublished: false,
   });
 
   revalidatePath("/admin/players");
@@ -109,6 +113,7 @@ export async function submitClubApplication(
       ...clubFields,
       source: "SELF_SUBMITTED",
       status: "NEW",
+      isPublished: false,
     })
     .returning({ id: clubs.id });
 

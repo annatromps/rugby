@@ -1,22 +1,37 @@
 import Link from "next/link";
-import { desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { players } from "@/lib/db/schema";
 import { PlayerStatusSelect } from "@/components/admin/player-status-select";
+import { PlayerPublishToggle } from "@/components/admin/player-publish-toggle";
 import { RECORD_STATUSES } from "@/lib/constants";
 
 export default async function PlayersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; pending?: string }>;
 }) {
-  const { status } = await searchParams;
+  const { status, pending } = await searchParams;
+  const showPendingOnly = pending === "1";
 
-  const rows = await db
-    .select()
-    .from(players)
-    .where(status ? eq(players.status, status as (typeof RECORD_STATUSES)[number]) : undefined)
-    .orderBy(desc(players.updatedAt));
+  const [rows, [pendingCountRow]] = await Promise.all([
+    db
+      .select()
+      .from(players)
+      .where(
+        showPendingOnly
+          ? and(eq(players.source, "SELF_SUBMITTED"), eq(players.isPublished, false))
+          : status
+            ? eq(players.status, status as (typeof RECORD_STATUSES)[number])
+            : undefined,
+      )
+      .orderBy(desc(players.updatedAt)),
+    db
+      .select({ value: count() })
+      .from(players)
+      .where(and(eq(players.source, "SELF_SUBMITTED"), eq(players.isPublished, false))),
+  ]);
+  const pendingCount = pendingCountRow?.value ?? 0;
 
   return (
     <div className="space-y-4">
@@ -35,21 +50,42 @@ export default async function PlayersPage({
         </Link>
       </div>
 
+      {pendingCount > 0 && !showPendingOnly && (
+        <Link
+          href="/admin/players?pending=1"
+          className="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 hover:bg-amber-100"
+        >
+          <span>
+            <strong>{pendingCount}</strong> self sign-up{pendingCount === 1 ? "" : "s"} waiting for review — not
+            visible on the public site yet.
+          </span>
+          <span className="font-medium underline">Review now</span>
+        </Link>
+      )}
+
       <div className="flex flex-wrap gap-1.5">
         <Link
           href="/admin/players"
           className={`rounded-full px-3 py-1 text-xs font-medium ${
-            !status ? "bg-slate-900 text-white" : "bg-white text-slate-600 border border-slate-200"
+            !status && !showPendingOnly ? "bg-slate-900 text-white" : "bg-white text-slate-600 border border-slate-200"
           }`}
         >
           All
+        </Link>
+        <Link
+          href="/admin/players?pending=1"
+          className={`rounded-full px-3 py-1 text-xs font-medium ${
+            showPendingOnly ? "bg-amber-600 text-white" : "bg-white text-amber-700 border border-amber-200"
+          }`}
+        >
+          Pending review{pendingCount > 0 ? ` (${pendingCount})` : ""}
         </Link>
         {RECORD_STATUSES.map((s) => (
           <Link
             key={s}
             href={`/admin/players?status=${s}`}
             className={`rounded-full px-3 py-1 text-xs font-medium ${
-              status === s ? "bg-slate-900 text-white" : "bg-white text-slate-600 border border-slate-200"
+              !showPendingOnly && status === s ? "bg-slate-900 text-white" : "bg-white text-slate-600 border border-slate-200"
             }`}
           >
             {s.replace("_", " ").toLowerCase()}
@@ -65,18 +101,25 @@ export default async function PlayersPage({
               <th className="px-4 py-3 font-medium">Position</th>
               <th className="px-4 py-3 font-medium">Based in</th>
               <th className="px-4 py-3 font-medium">Accommodation</th>
+              <th className="px-4 py-3 font-medium">Published</th>
               <th className="px-4 py-3 font-medium">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {rows.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-sm text-slate-400">
-                  No players yet.{" "}
-                  <Link href="/admin/players/new" className="text-slate-700 underline">
-                    Add the first one
-                  </Link>
-                  .
+                <td colSpan={6} className="px-4 py-8 text-center text-sm text-slate-400">
+                  {showPendingOnly ? (
+                    "Nothing waiting for review right now."
+                  ) : (
+                    <>
+                      No players yet.{" "}
+                      <Link href="/admin/players/new" className="text-slate-700 underline">
+                        Add the first one
+                      </Link>
+                      .
+                    </>
+                  )}
                 </td>
               </tr>
             )}
@@ -91,6 +134,13 @@ export default async function PlayersPage({
                 <td className="px-4 py-3 text-slate-600">{player.currentCountry ?? "—"}</td>
                 <td className="px-4 py-3 text-slate-500 text-xs">
                   {player.needsAccommodation ? "Needs help" : "—"}
+                </td>
+                <td className="px-4 py-3">
+                  {player.source === "SELF_SUBMITTED" ? (
+                    <PlayerPublishToggle playerId={player.id} isPublished={player.isPublished} />
+                  ) : (
+                    <span className="text-xs text-slate-400">—</span>
+                  )}
                 </td>
                 <td className="px-4 py-3">
                   <PlayerStatusSelect playerId={player.id} status={player.status} />

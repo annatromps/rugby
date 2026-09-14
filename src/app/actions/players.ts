@@ -86,6 +86,27 @@ export async function updatePlayerStatus(playerId: string, status: string) {
   revalidatePath("/admin/players");
 }
 
+// Publish gate for self-submitted players: a new sign-up lands with
+// isPublished: false so it never appears on the public site until a staff
+// member reviews it and flips this on.
+export async function setPlayerPublished(playerId: string, isPublished: boolean) {
+  await requireAdmin();
+
+  const [player] = await db
+    .update(players)
+    .set({ isPublished, updatedAt: new Date() })
+    .where(eq(players.id, playerId))
+    .returning({ id: players.id });
+
+  if (!player) throw new Error("Player not found");
+
+  revalidatePath(`/admin/players/${playerId}`);
+  revalidatePath("/admin/players");
+  revalidatePath("/players");
+  revalidatePath(`/players/${playerId}`);
+  revalidatePath("/");
+}
+
 const ContactLogSchema = z.object({
   method: z.enum(CONTACT_METHODS),
   summary: z.string().trim().min(1, "Add a short summary of the contact."),

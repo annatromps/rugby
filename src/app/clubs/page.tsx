@@ -18,6 +18,7 @@ export default async function ClubsPage({
 
   const conditions = [
     eq(clubs.source, "SELF_SUBMITTED"),
+    eq(clubs.isPublished, true),
     notInArray(clubs.status, PUBLIC_EXCLUDED_STATUSES),
   ];
   if (country) conditions.push(ilike(clubs.country, `%${country}%`));

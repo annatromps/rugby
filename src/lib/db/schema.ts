@@ -87,6 +87,11 @@ export const clubs = pgTable("clubs", {
   status: recordStatusEnum("status").notNull().default("NEW"),
   source: sourceTypeEnum("source").notNull().default("MANUAL"),
   sourceDetail: text("source_detail"), // e.g. the search query that surfaced this club
+  // Whether this record is visible on the public site. Self-submitted
+  // clubs start unpublished until a staff member reviews and approves
+  // them; anything entered by an admin (MANUAL/AI_SEARCH) is irrelevant
+  // here since the public pages only ever show SELF_SUBMITTED records.
+  isPublished: boolean("is_published").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -123,6 +128,8 @@ export const players = pgTable("players", {
   source: sourceTypeEnum("source").notNull().default("MANUAL"),
   sourceDetail: text("source_detail"),
   needsAccommodation: boolean("needs_accommodation").notNull().default(false),
+  // See the matching comment on clubs.isPublished above.
+  isPublished: boolean("is_published").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

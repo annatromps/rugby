@@ -20,7 +20,7 @@ export default async function PlayerProfilePage({
 
   const [player] = await db.select().from(players).where(eq(players.id, id)).limit(1);
 
-  if (!player || player.source !== "SELF_SUBMITTED" || PUBLIC_EXCLUDED_STATUSES.has(player.status)) {
+  if (!player || player.source !== "SELF_SUBMITTED" || !player.isPublished || PUBLIC_EXCLUDED_STATUSES.has(player.status)) {
     notFound();
   }
 

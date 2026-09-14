@@ -74,6 +74,27 @@ export async function updateClubStatus(clubId: string, status: string) {
   revalidatePath("/admin/clubs");
 }
 
+// Publish gate for self-submitted clubs: a new sign-up lands with
+// isPublished: false so it never appears on the public site until a staff
+// member reviews it and flips this on.
+export async function setClubPublished(clubId: string, isPublished: boolean) {
+  await requireAdmin();
+
+  const [club] = await db
+    .update(clubs)
+    .set({ isPublished, updatedAt: new Date() })
+    .where(eq(clubs.id, clubId))
+    .returning({ id: clubs.id });
+
+  if (!club) throw new Error("Club not found");
+
+  revalidatePath(`/admin/clubs/${clubId}`);
+  revalidatePath("/admin/clubs");
+  revalidatePath("/clubs");
+  revalidatePath(`/clubs/${clubId}`);
+  revalidatePath("/");
+}
+
 const PositionNeedSchema = z.object({
   position: z.string().trim().min(1, "Position is required."),
   level: optionalEnum(PLAYER_LEVELS),

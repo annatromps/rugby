@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { clubs, positionNeeds, contactLogs, placements, players } from "@/lib/db/schema";
 import { logClubContact } from "@/app/actions/clubs";
 import { ClubStatusSelect } from "@/components/admin/club-status-select";
+import { ClubPublishToggle } from "@/components/admin/club-publish-toggle";
 import { ClubEditForm } from "./club-edit-form";
 import { AddPositionForm, PositionsList } from "./positions";
 import { AddContactLogForm, ContactLogList } from "@/components/admin/contact-log";
@@ -49,7 +50,12 @@ export default async function ClubDetailPage({
             {club.league ? ` · ${club.league}` : ""}
           </p>
         </div>
-        <ClubStatusSelect clubId={club.id} status={club.status} />
+        <div className="flex items-center gap-2">
+          {club.source === "SELF_SUBMITTED" && (
+            <ClubPublishToggle clubId={club.id} isPublished={club.isPublished} />
+          )}
+          <ClubStatusSelect clubId={club.id} status={club.status} />
+        </div>
       </div>
 
       <Section title="Details">

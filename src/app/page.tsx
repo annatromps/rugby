@@ -17,6 +17,7 @@ async function getStats() {
       .where(
         and(
           eq(players.source, "SELF_SUBMITTED"),
+          eq(players.isPublished, true),
           notInArray(players.status, PUBLIC_EXCLUDED_STATUSES),
         ),
       ),
@@ -26,6 +27,7 @@ async function getStats() {
       .where(
         and(
           eq(clubs.source, "SELF_SUBMITTED"),
+          eq(clubs.isPublished, true),
           notInArray(clubs.status, PUBLIC_EXCLUDED_STATUSES),
         ),
       ),

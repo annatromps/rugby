@@ -18,6 +18,7 @@ export default async function PlayersPage({
 
   const conditions = [
     eq(players.source, "SELF_SUBMITTED"),
+    eq(players.isPublished, true),
     notInArray(players.status, PUBLIC_EXCLUDED_STATUSES),
   ];
   if (q) conditions.push(ilike(players.position, `%${q}%`));
