@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import { SiteHeader } from "@/components/public/site-header";
 import { SiteFooter } from "@/components/public/site-footer";
 import { PlayerApplicationForm } from "@/components/public/player-application-form";
+
+export const metadata: Metadata = {
+  title: "Join as a player",
+  description: "List yourself in the players directory so clubs can find you. Free, and reviewed before it goes live.",
+};
 
 export default function JoinPlayerPage() {
   return (

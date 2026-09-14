@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { and, desc, eq, ilike, notInArray } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { players } from "@/lib/db/schema";
@@ -8,6 +9,11 @@ import { PlayerCard } from "@/components/public/player-card";
 import { PLAYER_LEVELS, PLAYER_LEVEL_LABELS } from "@/lib/constants";
 
 const PUBLIC_EXCLUDED_STATUSES: Array<"ARCHIVED" | "PLACED"> = ["ARCHIVED", "PLACED"];
+
+export const metadata: Metadata = {
+  title: "Find players",
+  description: "Browse rugby players looking for a club, filterable by position, country, and level.",
+};
 
 export default async function PlayersPage({
   searchParams,

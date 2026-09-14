@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
+import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { clubs, positionNeeds } from "@/lib/db/schema";
 import { SiteHeader } from "@/components/public/site-header";
@@ -11,6 +12,31 @@ import { submitInquiry } from "@/app/actions/public";
 
 const PUBLIC_EXCLUDED_STATUSES = new Set(["ARCHIVED", "PLACED"]);
 
+async function getPublicClub(id: string) {
+  const [club] = await db.select().from(clubs).where(eq(clubs.id, id)).limit(1);
+  if (!club || club.source !== "SELF_SUBMITTED" || !club.isPublished || PUBLIC_EXCLUDED_STATUSES.has(club.status)) {
+    return null;
+  }
+  return club;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const club = await getPublicClub(id);
+  if (!club) return { title: "Club not found" };
+
+  const title = club.name;
+  const description = [club.league, [club.region, club.country].filter(Boolean).join(", ")]
+    .filter(Boolean)
+    .join(" · ") || "View this club's profile on Kickoff Rugby Recruitment.";
+
+  return { title, description };
+}
+
 export default async function ClubProfilePage({
   params,
 }: {
@@ -18,11 +44,8 @@ export default async function ClubProfilePage({
 }) {
   const { id } = await params;
 
-  const [club] = await db.select().from(clubs).where(eq(clubs.id, id)).limit(1);
-
-  if (!club || club.source !== "SELF_SUBMITTED" || !club.isPublished || PUBLIC_EXCLUDED_STATUSES.has(club.status)) {
-    notFound();
-  }
+  const club = await getPublicClub(id);
+  if (!club) notFound();
 
   const openPositions = await db
     .select()

@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import { SiteHeader } from "@/components/public/site-header";
 import { SiteFooter } from "@/components/public/site-footer";
 import { ClubApplicationForm } from "@/components/public/club-application-form";
+
+export const metadata: Metadata = {
+  title: "List your club",
+  description: "List your club in the directory so players can find you and see your open positions.",
+};
 
 export default function JoinClubPage() {
   return (

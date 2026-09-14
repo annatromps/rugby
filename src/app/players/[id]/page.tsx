@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
+import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { players } from "@/lib/db/schema";
 import { SiteHeader } from "@/components/public/site-header";
@@ -11,6 +12,31 @@ import { submitInquiry } from "@/app/actions/public";
 
 const PUBLIC_EXCLUDED_STATUSES = new Set(["ARCHIVED", "PLACED"]);
 
+async function getPublicPlayer(id: string) {
+  const [player] = await db.select().from(players).where(eq(players.id, id)).limit(1);
+  if (!player || player.source !== "SELF_SUBMITTED" || !player.isPublished || PUBLIC_EXCLUDED_STATUSES.has(player.status)) {
+    return null;
+  }
+  return player;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const player = await getPublicPlayer(id);
+  if (!player) return { title: "Player not found" };
+
+  const title = `${player.firstName} ${player.lastName} -- ${player.position}`;
+  const description = [player.currentCountry ? `Based in ${player.currentCountry}` : null, player.level]
+    .filter(Boolean)
+    .join(" · ") || "View this player's profile on Kickoff Rugby Recruitment.";
+
+  return { title, description };
+}
+
 export default async function PlayerProfilePage({
   params,
 }: {
@@ -18,11 +44,8 @@ export default async function PlayerProfilePage({
 }) {
   const { id } = await params;
 
-  const [player] = await db.select().from(players).where(eq(players.id, id)).limit(1);
-
-  if (!player || player.source !== "SELF_SUBMITTED" || !player.isPublished || PUBLIC_EXCLUDED_STATUSES.has(player.status)) {
-    notFound();
-  }
+  const player = await getPublicPlayer(id);
+  if (!player) notFound();
 
   const inquiryAction = submitInquiry.bind(null, { playerId: player.id });
 

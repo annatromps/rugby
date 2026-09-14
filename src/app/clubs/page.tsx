@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { and, desc, eq, ilike, inArray, notInArray } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { clubs, positionNeeds } from "@/lib/db/schema";
@@ -8,6 +9,11 @@ import { ClubCard } from "@/components/public/club-card";
 import { PLAYER_LEVELS, PLAYER_LEVEL_LABELS } from "@/lib/constants";
 
 const PUBLIC_EXCLUDED_STATUSES: Array<"ARCHIVED" | "PLACED"> = ["ARCHIVED", "PLACED"];
+
+export const metadata: Metadata = {
+  title: "Find clubs",
+  description: "Browse rugby clubs recruiting players, filterable by country and level, with open positions listed.",
+};
 
 export default async function ClubsPage({
   searchParams,
