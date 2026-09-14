@@ -4,6 +4,7 @@ import Image from "next/image";
 const NAV_LINKS = [
   { href: "/players", label: "Find players" },
   { href: "/clubs", label: "Find clubs" },
+  { href: "/positions", label: "Open positions" },
 ];
 
 export function SiteHeader() {
