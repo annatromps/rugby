@@ -6,7 +6,9 @@ Read `README.md` first for stack, structure, and local setup. This file is the e
 
 ## What this is
 
-A rugby recruitment marketplace: an admin (the business owner or their staff) manages clubs looking for players and players looking for clubs, tracks outreach through to placement, and helps place players who need accommodation once placed. There is currently no public-facing site or self-serve accounts -- everything lives behind the `/admin` login. If you're asked to add a public site, player/club self-submission forms, or self-serve accounts, that's new surface area, not a change to the existing admin tool -- keep the two cleanly separated (a new route group / new auth model) rather than bolting public access onto `requireAdmin()`-protected code.
+A rugby recruitment marketplace with two sides: a public site where clubs and players find each other and can self-submit a listing or an inquiry, and an admin dashboard (behind `/admin` login) where staff manage the pipeline through to placement and accommodation support. See `README.md` for the full picture, including the review-gate (`isPublished`) and verified-badge (`isVerified`) flags that control what the public actually sees.
+
+Keep the two sides cleanly separated: public routes and Server Actions (`src/app/actions/public.ts`, `src/app/page.tsx`, `src/app/players/`, `src/app/clubs/`, `src/app/positions/`, `src/app/join/*`) never call `requireAdmin()` and must never expose unpublished/unverified records or admin-only fields. Admin routes and actions always call `requireAdmin()` (see the house rule below). If you're asked to add a new kind of public self-serve flow, extend this pattern rather than bolting public access onto `requireAdmin()`-protected code.
 
 ## House rules for changes here
 
@@ -17,6 +19,9 @@ A rugby recruitment marketplace: an admin (the business owner or their staff) ma
 - **Middleware is called "Proxy" in this Next.js version** (`src/proxy.ts`, not `middleware.ts`). If your training data suggests `middleware.ts`, that's stale -- check `node_modules/next/dist/docs/app/getting-started/proxy.md` in whatever Next version is actually installed before assuming file conventions, since this project deliberately tracks current Next.js rather than pinning to an older, more "familiar" version.
 - **Shared enum values live in `src/lib/constants.ts`**, kept in sync by hand with the Postgres enums in `src/lib/db/schema.ts`. If you add a value to an enum in the schema, add it there too, and regenerate/apply a migration (`npm run db:generate && npm run db:migrate`).
 - When you change `schema.ts`, always generate and commit a migration in the same change -- don't leave the schema file and the database out of sync for someone else to reconcile.
+- **Public forms are rate-limited** (`src/lib/rate-limit.ts`, DB-backed, 5 submissions/hour/IP/form-type) and honeypot-protected. Any new public-facing form that writes to the database should call `checkRateLimit(formType)` the same way `src/app/actions/public.ts` does, right after the honeypot check.
+- **A self-submitted player or club is unpublished by default** (`isPublished: false` on insert) -- this is deliberate, not a bug. Never flip that default without an explicit product decision; it's the whole point of the review gate. Admin-created records default to published since a staff member already vetted them by adding them.
+- **`isVerified` is independent of `isPublished`.** Publishing controls whether something is visible at all; verifying is a separate manual trust signal staff apply after actually checking a listing. Don't conflate the two or auto-set one from the other.
 
 ## Before a handover to a new owner
 
@@ -29,4 +34,4 @@ If you're asked to help hand this project to a new owner, walk through:
 5. Run `npm run create-admin -- ...` to give the new owner (and revoke old ones, if appropriate) a login.
 6. Confirm they can reach `/admin/sourcing` and either have their own `ANTHROPIC_API_KEY` set, or understand that feature needs one.
 
-This file and the README are meant to make that handover need as little back-and-forth as possible -- keep both current as the app grows.
+This file, the README, and `ADMIN_RUNBOOK.md` are meant to make that handover need as little back-and-forth as possible -- keep all three current as the app grows.
