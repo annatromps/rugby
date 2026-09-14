@@ -43,7 +43,7 @@ export function SuggestionCard({
           <button
             disabled={isPending}
             onClick={() => startTransition(() => acceptSuggestion(suggestion.id))}
-            className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700 disabled:opacity-60"
+            className="rounded-md bg-brand-navy px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-navy-dark disabled:opacity-60"
           >
             Accept &amp; add to {suggestion.targetType === "CLUB" ? "clubs" : "players"}
           </button>

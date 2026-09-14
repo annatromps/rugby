@@ -44,7 +44,7 @@ export default async function PlayersPage({
         </div>
         <Link
           href="/admin/players/new"
-          className="rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-700"
+          className="rounded-md bg-brand-navy px-3 py-2 text-sm font-semibold text-white hover:bg-brand-navy-dark"
         >
           Add player
         </Link>
@@ -67,7 +67,7 @@ export default async function PlayersPage({
         <Link
           href="/admin/players"
           className={`rounded-full px-3 py-1 text-xs font-medium ${
-            !status && !showPendingOnly ? "bg-slate-900 text-white" : "bg-white text-slate-600 border border-slate-200"
+            !status && !showPendingOnly ? "bg-brand-navy text-white" : "bg-white text-slate-600 border border-slate-200"
           }`}
         >
           All
@@ -85,7 +85,7 @@ export default async function PlayersPage({
             key={s}
             href={`/admin/players?status=${s}`}
             className={`rounded-full px-3 py-1 text-xs font-medium ${
-              !showPendingOnly && status === s ? "bg-slate-900 text-white" : "bg-white text-slate-600 border border-slate-200"
+              !showPendingOnly && status === s ? "bg-brand-navy text-white" : "bg-white text-slate-600 border border-slate-200"
             }`}
           >
             {s.replace("_", " ").toLowerCase()}

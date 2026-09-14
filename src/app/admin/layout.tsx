@@ -1,18 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { requireAdmin } from "@/lib/auth/dal";
 import { logout } from "@/app/actions/auth";
+import { AdminNav } from "@/components/admin/admin-nav";
 
 export const metadata: Metadata = {
   title: "Admin",
 };
-
-const NAV_ITEMS = [
-  { href: "/admin", label: "Dashboard" },
-  { href: "/admin/clubs", label: "Clubs" },
-  { href: "/admin/players", label: "Players" },
-  { href: "/admin/sourcing", label: "AI Sourcing" },
-];
 
 export default async function AdminLayout({
   children,
@@ -24,37 +19,33 @@ export default async function AdminLayout({
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="flex">
-        <aside className="hidden w-56 shrink-0 border-r border-slate-200 bg-white sm:block">
-          <div className="flex h-14 items-center gap-2 border-b border-slate-200 px-4">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-slate-900 text-xs font-bold text-white">
-              KR
-            </div>
-            <span className="text-sm font-semibold text-slate-900">
-              Kickoff Rugby Recruitment
-            </span>
+        <aside className="hidden w-56 shrink-0 border-r border-slate-200 bg-white sm:flex sm:flex-col">
+          <Link href="/admin" className="flex h-16 items-center gap-2 border-b border-slate-200 px-4">
+            <Image
+              src="/kickoff-rugby-logo.png"
+              alt="Kickoff Rugby Recruitment"
+              width={176}
+              height={69}
+              priority
+              className="h-8 w-auto"
+            />
+          </Link>
+          <AdminNav className="flex-1 p-3" />
+          <div className="border-t border-slate-100 p-3">
+            <p className="px-3 text-xs font-medium uppercase tracking-wide text-slate-400">Signed in as</p>
+            <p className="truncate px-3 text-sm font-medium text-slate-700">{admin.name}</p>
           </div>
-          <nav className="flex flex-col gap-0.5 p-3">
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
         </aside>
 
         <div className="flex min-h-screen flex-1 flex-col">
           <header className="flex h-14 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-6">
-            <p className="text-sm text-slate-500 sm:hidden">Kickoff Rugby Recruitment</p>
+            <p className="text-sm font-semibold text-brand-navy sm:hidden">Kickoff Rugby Recruitment</p>
             <div className="ml-auto flex items-center gap-3">
-              <span className="text-sm text-slate-600">{admin.name}</span>
+              <span className="hidden text-sm text-slate-600 sm:inline">{admin.name}</span>
               <form action={logout}>
                 <button
                   type="submit"
-                  className="text-sm font-medium text-slate-500 hover:text-slate-900"
+                  className="text-sm font-medium text-slate-500 hover:text-brand-navy"
                 >
                   Sign out
                 </button>

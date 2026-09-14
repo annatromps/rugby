@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { count, eq, desc, or } from "drizzle-orm";
+import { and, count, eq, desc, or } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { clubs, players, sourcingSuggestions } from "@/lib/db/schema";
 import { StatusBadge } from "@/components/admin/status-badge";
@@ -10,6 +10,8 @@ async function getStats() {
     [{ value: playerCount }],
     [{ value: pendingSuggestions }],
     [{ value: activeTalks }],
+    [{ value: pendingPlayers }],
+    [{ value: pendingClubs }],
   ] = await Promise.all([
     db.select({ value: count() }).from(clubs),
     db.select({ value: count() }).from(players),
@@ -21,9 +23,23 @@ async function getStats() {
       .select({ value: count() })
       .from(clubs)
       .where(or(eq(clubs.status, "IN_TALKS"), eq(clubs.status, "CONTACTED"))),
+    db
+      .select({ value: count() })
+      .from(players)
+      .where(and(eq(players.source, "SELF_SUBMITTED"), eq(players.isPublished, false))),
+    db
+      .select({ value: count() })
+      .from(clubs)
+      .where(and(eq(clubs.source, "SELF_SUBMITTED"), eq(clubs.isPublished, false))),
   ]);
 
-  return { clubCount, playerCount, pendingSuggestions, activeTalks };
+  return {
+    clubCount,
+    playerCount,
+    pendingSuggestions,
+    activeTalks,
+    pendingSignups: pendingPlayers + pendingClubs,
+  };
 }
 
 async function getRecentActivity() {
@@ -60,17 +76,19 @@ export default async function DashboardPage() {
   ]);
 
   const cards = [
-    { label: "Clubs", value: stats.clubCount, href: "/admin/clubs" },
-    { label: "Players", value: stats.playerCount, href: "/admin/players" },
+    { label: "Clubs", value: stats.clubCount, href: "/admin/clubs", accent: "bg-brand-navy" },
+    { label: "Players", value: stats.playerCount, href: "/admin/players", accent: "bg-brand-navy" },
     {
-      label: "Suggestions to review",
+      label: "Sourcing suggestions to review",
       value: stats.pendingSuggestions,
       href: "/admin/sourcing",
+      accent: "bg-slate-400",
     },
     {
       label: "In active talks",
       value: stats.activeTalks,
       href: "/admin/clubs?status=IN_TALKS",
+      accent: "bg-slate-400",
     },
   ];
 
@@ -83,15 +101,29 @@ export default async function DashboardPage() {
         </p>
       </div>
 
+      {stats.pendingSignups > 0 && (
+        <div className="flex items-center justify-between rounded-lg border border-brand-coral/30 bg-brand-coral/[0.06] px-4 py-3 text-sm">
+          <span className="text-slate-700">
+            <strong className="font-semibold text-brand-navy">{stats.pendingSignups}</strong> self sign-up
+            {stats.pendingSignups === 1 ? "" : "s"} from the public site {stats.pendingSignups === 1 ? "is" : "are"}{" "}
+            waiting for review before going live.
+          </span>
+          <Link href="/admin/players?pending=1" className="shrink-0 font-medium text-brand-navy hover:underline">
+            Review now
+          </Link>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {cards.map((card) => (
           <Link
             key={card.label}
             href={card.href}
-            className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:border-slate-300"
+            className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:border-slate-300"
           >
+            <span className={`absolute inset-x-0 top-0 h-1 ${card.accent}`} />
             <p className="text-sm text-slate-500">{card.label}</p>
-            <p className="mt-1 text-2xl font-semibold text-slate-900">
+            <p className="mt-1.5 text-2xl font-semibold tabular-nums text-slate-900">
               {card.value}
             </p>
           </Link>
@@ -104,7 +136,7 @@ export default async function DashboardPage() {
             <h2 className="text-sm font-semibold text-slate-900">
               Recently updated clubs
             </h2>
-            <Link href="/admin/clubs" className="text-xs text-slate-500 hover:underline">
+            <Link href="/admin/clubs" className="text-xs text-slate-500 hover:text-brand-navy hover:underline">
               View all
             </Link>
           </div>
@@ -131,7 +163,7 @@ export default async function DashboardPage() {
             <h2 className="text-sm font-semibold text-slate-900">
               Recently updated players
             </h2>
-            <Link href="/admin/players" className="text-xs text-slate-500 hover:underline">
+            <Link href="/admin/players" className="text-xs text-slate-500 hover:text-brand-navy hover:underline">
               View all
             </Link>
           </div>
