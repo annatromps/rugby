@@ -95,6 +95,25 @@ export async function setClubPublished(clubId: string, isPublished: boolean) {
   revalidatePath("/");
 }
 
+// A manual staff signal (not tied to the review/publish gate above) that
+// this club has actually been checked. Shown as a badge on the public
+// site once published.
+export async function setClubVerified(clubId: string, isVerified: boolean) {
+  await requireAdmin();
+
+  const [club] = await db
+    .update(clubs)
+    .set({ isVerified, updatedAt: new Date() })
+    .where(eq(clubs.id, clubId))
+    .returning({ id: clubs.id });
+
+  if (!club) throw new Error("Club not found");
+
+  revalidatePath(`/admin/clubs/${clubId}`);
+  revalidatePath("/admin/clubs");
+  revalidatePath(`/clubs/${clubId}`);
+}
+
 const PositionNeedSchema = z.object({
   position: z.string().trim().min(1, "Position is required."),
   level: optionalEnum(PLAYER_LEVELS),

@@ -107,6 +107,25 @@ export async function setPlayerPublished(playerId: string, isPublished: boolean)
   revalidatePath("/");
 }
 
+// A manual staff signal (not tied to the review/publish gate above) that
+// this player has actually been checked. Shown as a badge on the public
+// site once published.
+export async function setPlayerVerified(playerId: string, isVerified: boolean) {
+  await requireAdmin();
+
+  const [player] = await db
+    .update(players)
+    .set({ isVerified, updatedAt: new Date() })
+    .where(eq(players.id, playerId))
+    .returning({ id: players.id });
+
+  if (!player) throw new Error("Player not found");
+
+  revalidatePath(`/admin/players/${playerId}`);
+  revalidatePath("/admin/players");
+  revalidatePath(`/players/${playerId}`);
+}
+
 const ContactLogSchema = z.object({
   method: z.enum(CONTACT_METHODS),
   summary: z.string().trim().min(1, "Add a short summary of the contact."),

@@ -92,6 +92,10 @@ export const clubs = pgTable("clubs", {
   // them; anything entered by an admin (MANUAL/AI_SEARCH) is irrelevant
   // here since the public pages only ever show SELF_SUBMITTED records.
   isPublished: boolean("is_published").notNull().default(true),
+  // A manual staff signal that this listing has been checked (real club,
+  // real contact) -- shown as a badge on the public site to build trust
+  // in a brand-new marketplace with no reputation history yet.
+  isVerified: boolean("is_verified").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -130,6 +134,8 @@ export const players = pgTable("players", {
   needsAccommodation: boolean("needs_accommodation").notNull().default(false),
   // See the matching comment on clubs.isPublished above.
   isPublished: boolean("is_published").notNull().default(true),
+  // See the matching comment on clubs.isVerified above.
+  isVerified: boolean("is_verified").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

@@ -7,6 +7,7 @@ import { players } from "@/lib/db/schema";
 import { SiteHeader } from "@/components/public/site-header";
 import { SiteFooter } from "@/components/public/site-footer";
 import { LevelBadge } from "@/components/public/level-badge";
+import { VerifiedBadge } from "@/components/public/verified-badge";
 import { InquiryForm } from "@/components/public/inquiry-form";
 import { submitInquiry } from "@/app/actions/public";
 
@@ -64,6 +65,7 @@ export default async function PlayerProfilePage({
                 {player.firstName} {player.lastName}
               </h1>
               <LevelBadge level={player.level} />
+              {player.isVerified && <VerifiedBadge />}
             </div>
             <p className="mt-1 text-lg font-medium text-brand-coral">
               {player.position}

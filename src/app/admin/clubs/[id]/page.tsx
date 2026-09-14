@@ -5,6 +5,7 @@ import { clubs, positionNeeds, contactLogs, placements, players } from "@/lib/db
 import { logClubContact } from "@/app/actions/clubs";
 import { ClubStatusSelect } from "@/components/admin/club-status-select";
 import { ClubPublishToggle } from "@/components/admin/club-publish-toggle";
+import { ClubVerifiedToggle } from "@/components/admin/club-verified-toggle";
 import { ClubEditForm } from "./club-edit-form";
 import { AddPositionForm, PositionsList } from "./positions";
 import { AddContactLogForm, ContactLogList } from "@/components/admin/contact-log";
@@ -54,6 +55,7 @@ export default async function ClubDetailPage({
           {club.source === "SELF_SUBMITTED" && (
             <ClubPublishToggle clubId={club.id} isPublished={club.isPublished} />
           )}
+          <ClubVerifiedToggle clubId={club.id} isVerified={club.isVerified} />
           <ClubStatusSelect clubId={club.id} status={club.status} />
         </div>
       </div>

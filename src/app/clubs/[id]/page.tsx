@@ -7,6 +7,7 @@ import { clubs, positionNeeds } from "@/lib/db/schema";
 import { SiteHeader } from "@/components/public/site-header";
 import { SiteFooter } from "@/components/public/site-footer";
 import { LevelBadge } from "@/components/public/level-badge";
+import { VerifiedBadge } from "@/components/public/verified-badge";
 import { InquiryForm } from "@/components/public/inquiry-form";
 import { submitInquiry } from "@/app/actions/public";
 
@@ -67,6 +68,7 @@ export default async function ClubProfilePage({
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-2xl font-bold text-slate-900">{club.name}</h1>
               <LevelBadge level={club.level} />
+              {club.isVerified && <VerifiedBadge />}
             </div>
             <p className="mt-1 text-sm text-slate-500">
               {[club.region, club.country].filter(Boolean).join(", ")}

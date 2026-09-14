@@ -5,6 +5,7 @@ import { players, contactLogs, accommodationRequests, placements, clubs } from "
 import { logPlayerContact } from "@/app/actions/players";
 import { PlayerStatusSelect } from "@/components/admin/player-status-select";
 import { PlayerPublishToggle } from "@/components/admin/player-publish-toggle";
+import { PlayerVerifiedToggle } from "@/components/admin/player-verified-toggle";
 import { AddContactLogForm, ContactLogList } from "@/components/admin/contact-log";
 import { PlayerEditForm } from "./player-edit-form";
 import { AccommodationList } from "./accommodation";
@@ -58,6 +59,7 @@ export default async function PlayerDetailPage({
           {player.source === "SELF_SUBMITTED" && (
             <PlayerPublishToggle playerId={player.id} isPublished={player.isPublished} />
           )}
+          <PlayerVerifiedToggle playerId={player.id} isVerified={player.isVerified} />
           <PlayerStatusSelect playerId={player.id} status={player.status} />
         </div>
       </div>
