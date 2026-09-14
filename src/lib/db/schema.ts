@@ -204,6 +204,19 @@ export const accommodationRequests = pgTable("accommodation_requests", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// ---------- Spam / abuse mitigation ----------
+
+// One row per public-form submission attempt, keyed by a hashed IP address
+// (never the raw IP) and which form was hit. Used to rate-limit the public
+// sign-up and inquiry forms; old rows are pruned opportunistically by the
+// rate-limit check itself rather than needing a separate cron job.
+export const rateLimitEvents = pgTable("rate_limit_events", {
+  id: id(),
+  ipHash: text("ip_hash").notNull(),
+  formType: text("form_type").notNull(), // e.g. "player_application"
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // ---------- AI-assisted sourcing ----------
 
 export const searchTargetTypeEnum = pgEnum("search_target_type", [

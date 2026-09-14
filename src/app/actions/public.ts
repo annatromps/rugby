@@ -18,6 +18,7 @@ import { db } from "@/lib/db";
 import { players, clubs, positionNeeds, contactLogs } from "@/lib/db/schema";
 import { PLAYER_LEVELS } from "@/lib/constants";
 import { optionalEnum } from "@/lib/validation";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export type PublicFormState =
   | { success: true }
@@ -55,6 +56,9 @@ export async function submitPlayerApplication(
   formData: FormData,
 ): Promise<PublicFormState> {
   if (isBot(formData)) return { success: true };
+  if (!(await checkRateLimit("player_application"))) {
+    return { error: "Too many submissions from this connection recently. Please try again in a bit." };
+  }
 
   const raw = Object.fromEntries(formData);
   const parsed = PlayerApplicationSchema.safeParse({
@@ -99,6 +103,9 @@ export async function submitClubApplication(
   formData: FormData,
 ): Promise<PublicFormState> {
   if (isBot(formData)) return { success: true };
+  if (!(await checkRateLimit("club_application"))) {
+    return { error: "Too many submissions from this connection recently. Please try again in a bit." };
+  }
 
   const parsed = ClubApplicationSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
@@ -144,6 +151,9 @@ export async function submitInquiry(
   formData: FormData,
 ): Promise<PublicFormState> {
   if (isBot(formData)) return { success: true };
+  if (!(await checkRateLimit("inquiry"))) {
+    return { error: "Too many submissions from this connection recently. Please try again in a bit." };
+  }
 
   const parsed = InquirySchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
