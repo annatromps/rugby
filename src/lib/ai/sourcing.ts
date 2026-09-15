@@ -47,8 +47,10 @@ export type SourcingCandidate = {
   secondaryPosition?: string; // players
   nationality?: string; // players
   currentCountry?: string; // players: country currently based in
-  currentClub?: string; // players: current club, free text
-  yearsExperience?: number; // players
+  currentClub?: string; // players/coaches: current club, free text
+  yearsExperience?: number; // players/coaches
+  specialization?: string; // coaches: coaching specialization
+  coachingLevel?: string; // coaches: coaching qualification level
 };
 
 export class MissingApiKeyError extends Error {
@@ -136,7 +138,15 @@ const CANDIDATE_LIST_TOOL = {
             },
             yearsExperience: {
               type: "number" as const,
-              description: "PLAYERS ONLY. Years of experience, if stated.",
+              description: "PLAYERS/COACHES. Years of experience, if stated.",
+            },
+            specialization: {
+              type: "string" as const,
+              description: "COACHES ONLY. Coaching specialization, e.g. forwards/scrum, if known.",
+            },
+            coachingLevel: {
+              type: "string" as const,
+              description: "COACHES ONLY. Coaching qualification level, if known.",
             },
           },
           required: ["name", "summary"],
@@ -148,7 +158,7 @@ const CANDIDATE_LIST_TOOL = {
 };
 
 export async function runSourcingSearch(
-  targetType: "CLUB" | "PLAYER",
+  targetType: "CLUB" | "PLAYER" | "COACH",
   brief: string,
 ): Promise<SourcingCandidate[]> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -156,7 +166,8 @@ export async function runSourcingSearch(
     throw new MissingApiKeyError();
   }
 
-  const targetLabel = targetType === "CLUB" ? "rugby clubs" : "rugby players";
+  const targetLabel =
+    targetType === "CLUB" ? "rugby clubs" : targetType === "COACH" ? "rugby coaches" : "rugby players";
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",

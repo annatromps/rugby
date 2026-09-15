@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { and, eq, notInArray, count } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { players, clubs, testimonials } from "@/lib/db/schema";
+import { players, clubs, coaches, testimonials } from "@/lib/db/schema";
 import { SiteHeader } from "@/components/public/site-header";
 import { SiteFooter } from "@/components/public/site-footer";
 
@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 const PUBLIC_EXCLUDED_STATUSES: Array<"ARCHIVED" | "PLACED"> = ["ARCHIVED", "PLACED"];
 
 async function getStats() {
-  const [[playerRow], [clubRow]] = await Promise.all([
+  const [[playerRow], [clubRow], [coachRow]] = await Promise.all([
     db
       .select({ value: count() })
       .from(players)
@@ -31,8 +31,18 @@ async function getStats() {
           notInArray(clubs.status, PUBLIC_EXCLUDED_STATUSES),
         ),
       ),
+    db
+      .select({ value: count() })
+      .from(coaches)
+      .where(
+        and(
+          eq(coaches.source, "SELF_SUBMITTED"),
+          eq(coaches.isPublished, true),
+          notInArray(coaches.status, PUBLIC_EXCLUDED_STATUSES),
+        ),
+      ),
   ]);
-  return { players: playerRow.value, clubs: clubRow.value };
+  return { players: playerRow.value, clubs: clubRow.value, coaches: coachRow.value };
 }
 
 export default async function HomePage() {
@@ -49,10 +59,10 @@ export default async function HomePage() {
         <section className="bg-brand-navy">
           <div className="mx-auto max-w-6xl px-4 py-16 text-center sm:px-6 sm:py-24">
             <h1 className="text-3xl font-bold tracking-tight text-white sm:text-5xl">
-              Where rugby players and clubs find each other
+              Where rugby players, coaches, and clubs find each other
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-base text-slate-200 sm:text-lg">
-              Browse players looking for a club, clubs looking for players, and
+              Browse players and coaches looking for a club, clubs looking to recruit, and
               open positions worldwide — from community sides to professional
               academies.
             </p>
@@ -61,17 +71,24 @@ export default async function HomePage() {
                 href="/players"
                 className="w-full rounded-md bg-white px-5 py-3 text-sm font-semibold text-brand-navy shadow-sm hover:bg-slate-100 sm:w-auto"
               >
-                Browse players
+                I&rsquo;m a player
+              </Link>
+              <Link
+                href="/coaches"
+                className="w-full rounded-md bg-white px-5 py-3 text-sm font-semibold text-brand-navy shadow-sm hover:bg-slate-100 sm:w-auto"
+              >
+                I&rsquo;m a coach
               </Link>
               <Link
                 href="/clubs"
                 className="w-full rounded-md bg-brand-coral px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brand-coral-dark sm:w-auto"
               >
-                Browse clubs
+                I represent a club
               </Link>
             </div>
             <p className="mt-6 text-sm text-slate-300">
-              {stats.players} player{stats.players === 1 ? "" : "s"} registered &middot;{" "}
+              {stats.players} player{stats.players === 1 ? "" : "s"} &middot;{" "}
+              {stats.coaches} coach{stats.coaches === 1 ? "" : "es"} &middot;{" "}
               {stats.clubs} club{stats.clubs === 1 ? "" : "s"} recruiting
             </p>
           </div>
@@ -83,8 +100,8 @@ export default async function HomePage() {
               <div className="text-2xl font-bold text-brand-coral">1</div>
               <h3 className="mt-1 font-semibold text-slate-900">Create a profile</h3>
               <p className="mt-1 text-sm text-slate-600">
-                Players list their position, level and experience. Clubs list
-                their league, level and open positions.
+                Players and coaches list their position or specialization, level and
+                experience. Clubs list their league, level and open positions.
               </p>
             </div>
             <div>
@@ -134,6 +151,12 @@ export default async function HomePage() {
                 className="rounded-md border border-brand-navy px-5 py-2.5 text-sm font-semibold text-brand-navy hover:bg-brand-navy hover:text-white"
               >
                 Join as a player
+              </Link>
+              <Link
+                href="/join/coach"
+                className="rounded-md border border-brand-navy px-5 py-2.5 text-sm font-semibold text-brand-navy hover:bg-brand-navy hover:text-white"
+              >
+                Join as a coach
               </Link>
               <Link
                 href="/join/club"

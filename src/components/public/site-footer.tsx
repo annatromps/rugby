@@ -12,8 +12,20 @@ export function SiteFooter() {
           <Link href="/clubs" className="hover:text-brand-navy">
             Find clubs
           </Link>
+          <Link href="/coaches" className="hover:text-brand-navy">
+            Find coaches
+          </Link>
+          <Link href="/how-it-works" className="hover:text-brand-navy">
+            How it works
+          </Link>
+          <Link href="/pricing" className="hover:text-brand-navy">
+            Pricing
+          </Link>
           <Link href="/join/player" className="hover:text-brand-navy">
             Join as a player
+          </Link>
+          <Link href="/join/coach" className="hover:text-brand-navy">
+            Join as a coach
           </Link>
           <Link href="/join/club" className="hover:text-brand-navy">
             List your club

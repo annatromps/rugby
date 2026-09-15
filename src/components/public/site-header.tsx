@@ -4,7 +4,10 @@ import Image from "next/image";
 const NAV_LINKS = [
   { href: "/players", label: "Find players" },
   { href: "/clubs", label: "Find clubs" },
+  { href: "/coaches", label: "Find coaches" },
   { href: "/positions", label: "Open positions" },
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/pricing", label: "Pricing" },
 ];
 
 export function SiteHeader() {

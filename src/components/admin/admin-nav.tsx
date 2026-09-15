@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/clubs", label: "Clubs" },
   { href: "/admin/players", label: "Players" },
+  { href: "/admin/coaches", label: "Coaches" },
   { href: "/admin/sourcing", label: "AI Sourcing" },
   { href: "/admin/settings/email-templates", label: "Email Templates" },
   { href: "/admin/settings/pricing", label: "Pricing" },

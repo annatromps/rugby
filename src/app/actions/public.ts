@@ -15,7 +15,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { players, clubs, positionNeeds, contactLogs } from "@/lib/db/schema";
+import { players, clubs, coaches, positionNeeds, contactLogs } from "@/lib/db/schema";
 import { PLAYER_LEVELS } from "@/lib/constants";
 import { optionalEnum } from "@/lib/validation";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -136,6 +136,48 @@ export async function submitClubApplication(
   return { success: true };
 }
 
+// ---------- Coach sign-up ----------
+
+const CoachApplicationSchema = z.object({
+  firstName: z.string().trim().min(1, "First name is required."),
+  lastName: z.string().trim().min(1, "Last name is required."),
+  email: z.string().trim().min(1, "Email is required so clubs can reach you.").email("Enter a valid email."),
+  phone: z.string().trim().optional(),
+  nationality: z.string().trim().optional(),
+  currentCountry: z.string().trim().optional(),
+  specialization: z.string().trim().min(1, "Specialization is required."),
+  coachingLevel: z.string().trim().optional(),
+  currentClub: z.string().trim().optional(),
+  yearsExperience: z.coerce.number().int().min(0).max(60).optional(),
+  highlightUrl: z.string().trim().optional(),
+  notes: z.string().trim().max(2000).optional(),
+});
+
+export async function submitCoachApplication(
+  _prevState: PublicFormState,
+  formData: FormData,
+): Promise<PublicFormState> {
+  if (isBot(formData)) return { success: true };
+  if (!(await checkRateLimit("coach_application"))) {
+    return { error: "Too many submissions from this connection recently. Please try again in a bit." };
+  }
+
+  const parsed = CoachApplicationSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) {
+    return { fieldErrors: parsed.error.flatten().fieldErrors };
+  }
+
+  await db.insert(coaches).values({
+    ...parsed.data,
+    source: "SELF_SUBMITTED",
+    status: "NEW",
+    isPublished: false,
+  });
+
+  revalidatePath("/admin/coaches");
+  return { success: true };
+}
+
 // ---------- Inquiries from a player/club profile page ----------
 
 const InquirySchema = z.object({
@@ -146,7 +188,7 @@ const InquirySchema = z.object({
 });
 
 export async function submitInquiry(
-  target: { playerId?: string; clubId?: string },
+  target: { playerId?: string; clubId?: string; coachId?: string },
   _prevState: PublicFormState,
   formData: FormData,
 ): Promise<PublicFormState> {
@@ -166,12 +208,14 @@ export async function submitInquiry(
   await db.insert(contactLogs).values({
     playerId: target.playerId,
     clubId: target.clubId,
+    coachId: target.coachId,
     method: "EMAIL",
     summary,
   });
 
   if (target.playerId) revalidatePath(`/admin/players/${target.playerId}`);
   if (target.clubId) revalidatePath(`/admin/clubs/${target.clubId}`);
+  if (target.coachId) revalidatePath(`/admin/coaches/${target.coachId}`);
 
   return { success: true };
 }

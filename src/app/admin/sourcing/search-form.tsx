@@ -17,6 +17,7 @@ export function SearchForm() {
           >
             <option value="CLUB">Clubs</option>
             <option value="PLAYER">Players</option>
+            <option value="COACH">Coaches</option>
           </select>
         </div>
         <div className="flex-1 min-w-[280px]">

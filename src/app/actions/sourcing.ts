@@ -4,12 +4,12 @@ import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { sourcingSearches, sourcingSuggestions, clubs, players } from "@/lib/db/schema";
+import { sourcingSearches, sourcingSuggestions, clubs, players, coaches } from "@/lib/db/schema";
 import { requireAdmin } from "@/lib/auth/dal";
 import { runSourcingSearch, MissingApiKeyError, SOURCING_LEVEL_VALUES } from "@/lib/ai/sourcing";
 
 const SearchSchema = z.object({
-  targetType: z.enum(["CLUB", "PLAYER"]),
+  targetType: z.enum(["CLUB", "PLAYER", "COACH"]),
   brief: z.string().trim().min(10, "Describe what you're looking for in a bit more detail."),
 });
 
@@ -135,6 +135,31 @@ export async function acceptSuggestion(suggestionId: string) {
       .update(sourcingSuggestions)
       .set({ reviewStatus: "ACCEPTED", promotedClubId: club.id })
       .where(eq(sourcingSuggestions.id, suggestionId));
+  } else if (suggestion.targetType === "COACH") {
+    const [firstName, ...rest] = suggestion.name.split(" ");
+    const [coach] = await db
+      .insert(coaches)
+      .values({
+        firstName: firstName || suggestion.name,
+        lastName: rest.join(" ") || "-",
+        email: str("contactEmail"),
+        phone: str("contactPhone"),
+        nationality: str("nationality"),
+        currentCountry: str("currentCountry"),
+        specialization: str("specialization") ?? "Unknown", // admin should fill this in if still missing
+        coachingLevel: str("coachingLevel"),
+        currentClub: str("currentClub"),
+        yearsExperience: num("yearsExperience"),
+        notes: suggestion.summary,
+        source: "AI_SEARCH",
+        sourceDetail: suggestion.sourceUrl ?? undefined,
+      })
+      .returning({ id: coaches.id });
+
+    await db
+      .update(sourcingSuggestions)
+      .set({ reviewStatus: "ACCEPTED", promotedCoachId: coach.id })
+      .where(eq(sourcingSuggestions.id, suggestionId));
   } else {
     const [firstName, ...rest] = suggestion.name.split(" ");
     const [player] = await db
@@ -166,4 +191,5 @@ export async function acceptSuggestion(suggestionId: string) {
   revalidatePath("/admin/sourcing");
   revalidatePath("/admin/clubs");
   revalidatePath("/admin/players");
+  revalidatePath("/admin/coaches");
 }
