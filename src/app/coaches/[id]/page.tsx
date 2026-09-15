@@ -15,7 +15,7 @@ const PUBLIC_EXCLUDED_STATUSES = new Set(["ARCHIVED", "PLACED"]);
 
 async function getPublicCoach(id: string) {
   const [coach] = await db.select().from(coaches).where(eq(coaches.id, id)).limit(1);
-  if (!coach || coach.source !== "SELF_SUBMITTED" || !coach.isPublished || PUBLIC_EXCLUDED_STATUSES.has(coach.status)) {
+  if (!coach || !coach.isPublished || PUBLIC_EXCLUDED_STATUSES.has(coach.status)) {
     return null;
   }
   return coach;

@@ -16,7 +16,7 @@ const PUBLIC_EXCLUDED_STATUSES = new Set(["ARCHIVED", "PLACED"]);
 
 async function getPublicPlayer(id: string) {
   const [player] = await db.select().from(players).where(eq(players.id, id)).limit(1);
-  if (!player || player.source !== "SELF_SUBMITTED" || !player.isPublished || PUBLIC_EXCLUDED_STATUSES.has(player.status)) {
+  if (!player || !player.isPublished || PUBLIC_EXCLUDED_STATUSES.has(player.status)) {
     return null;
   }
   return player;

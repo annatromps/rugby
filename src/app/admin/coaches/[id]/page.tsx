@@ -46,9 +46,7 @@ export default async function CoachDetailPage({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {coach.source === "SELF_SUBMITTED" && (
-            <CoachPublishToggle coachId={coach.id} isPublished={coach.isPublished} />
-          )}
+          <CoachPublishToggle coachId={coach.id} isPublished={coach.isPublished} />
           <CoachVerifiedToggle coachId={coach.id} isVerified={coach.isVerified} />
           <CoachStatusSelect coachId={coach.id} status={coach.status} />
           <EmailComposeButton

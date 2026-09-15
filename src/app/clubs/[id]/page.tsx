@@ -26,7 +26,7 @@ function clubInitials(name: string): string {
 
 async function getPublicClub(id: string) {
   const [club] = await db.select().from(clubs).where(eq(clubs.id, id)).limit(1);
-  if (!club || club.source !== "SELF_SUBMITTED" || !club.isPublished || PUBLIC_EXCLUDED_STATUSES.has(club.status)) {
+  if (!club || !club.isPublished || PUBLIC_EXCLUDED_STATUSES.has(club.status)) {
     return null;
   }
   return club;

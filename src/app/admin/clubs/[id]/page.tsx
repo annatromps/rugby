@@ -58,9 +58,7 @@ export default async function ClubDetailPage({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {club.source === "SELF_SUBMITTED" && (
-            <ClubPublishToggle clubId={club.id} isPublished={club.isPublished} />
-          )}
+          <ClubPublishToggle clubId={club.id} isPublished={club.isPublished} />
           <ClubVerifiedToggle clubId={club.id} isVerified={club.isVerified} />
           <ClubStatusSelect clubId={club.id} status={club.status} />
           <EmailComposeButton

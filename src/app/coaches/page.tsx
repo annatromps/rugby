@@ -22,7 +22,6 @@ export default async function CoachesPage({
   const { q, country } = await searchParams;
 
   const conditions = [
-    eq(coaches.source, "SELF_SUBMITTED"),
     eq(coaches.isPublished, true),
     notInArray(coaches.status, PUBLIC_EXCLUDED_STATUSES),
   ];

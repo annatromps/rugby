@@ -136,11 +136,7 @@ export default async function CoachesPage({
                 <td className="px-4 py-3 text-slate-600">{coach.specialization}</td>
                 <td className="px-4 py-3 text-slate-600">{coach.currentCountry ?? "—"}</td>
                 <td className="px-4 py-3">
-                  {coach.source === "SELF_SUBMITTED" ? (
-                    <CoachPublishToggle coachId={coach.id} isPublished={coach.isPublished} />
-                  ) : (
-                    <span className="text-xs text-slate-400">—</span>
-                  )}
+                  <CoachPublishToggle coachId={coach.id} isPublished={coach.isPublished} />
                 </td>
                 <td className="px-4 py-3">
                   <CoachStatusSelect coachId={coach.id} status={coach.status} />

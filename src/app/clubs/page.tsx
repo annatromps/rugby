@@ -23,7 +23,6 @@ export default async function ClubsPage({
   const { country, level } = await searchParams;
 
   const conditions = [
-    eq(clubs.source, "SELF_SUBMITTED"),
     eq(clubs.isPublished, true),
     notInArray(clubs.status, PUBLIC_EXCLUDED_STATUSES),
   ];

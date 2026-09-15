@@ -141,11 +141,7 @@ export default async function ClubsPage({
                 </td>
                 <td className="px-4 py-3 text-slate-500 text-xs">{club.source.replace("_", " ").toLowerCase()}</td>
                 <td className="px-4 py-3">
-                  {club.source === "SELF_SUBMITTED" ? (
-                    <ClubPublishToggle clubId={club.id} isPublished={club.isPublished} />
-                  ) : (
-                    <span className="text-xs text-slate-400">—</span>
-                  )}
+                  <ClubPublishToggle clubId={club.id} isPublished={club.isPublished} />
                 </td>
                 <td className="px-4 py-3">
                   <ClubStatusSelect clubId={club.id} status={club.status} />

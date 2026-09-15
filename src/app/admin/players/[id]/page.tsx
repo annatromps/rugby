@@ -62,9 +62,7 @@ export default async function PlayerDetailPage({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {player.source === "SELF_SUBMITTED" && (
-            <PlayerPublishToggle playerId={player.id} isPublished={player.isPublished} />
-          )}
+          <PlayerPublishToggle playerId={player.id} isPublished={player.isPublished} />
           <PlayerVerifiedToggle playerId={player.id} isVerified={player.isVerified} />
           <PlayerStatusSelect playerId={player.id} status={player.status} />
           <EmailComposeButton

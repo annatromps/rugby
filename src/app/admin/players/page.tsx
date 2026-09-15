@@ -142,11 +142,7 @@ export default async function PlayersPage({
                   {player.needsAccommodation ? "Needs help" : "—"}
                 </td>
                 <td className="px-4 py-3">
-                  {player.source === "SELF_SUBMITTED" ? (
-                    <PlayerPublishToggle playerId={player.id} isPublished={player.isPublished} />
-                  ) : (
-                    <span className="text-xs text-slate-400">—</span>
-                  )}
+                  <PlayerPublishToggle playerId={player.id} isPublished={player.isPublished} />
                 </td>
                 <td className="px-4 py-3">
                   <PlayerStatusSelect playerId={player.id} status={player.status} />
