@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { and, eq, notInArray, count } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { players, clubs } from "@/lib/db/schema";
+import { players, clubs, testimonials } from "@/lib/db/schema";
 import { SiteHeader } from "@/components/public/site-header";
 import { SiteFooter } from "@/components/public/site-footer";
 
@@ -36,7 +36,10 @@ async function getStats() {
 }
 
 export default async function HomePage() {
-  const stats = await getStats();
+  const [stats, activeTestimonials] = await Promise.all([
+    getStats(),
+    db.select().from(testimonials).where(eq(testimonials.isActive, true)).orderBy(testimonials.sortOrder),
+  ]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -102,6 +105,25 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+
+        {activeTestimonials.length > 0 && (
+          <section className="border-t border-slate-200 bg-white">
+            <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+              <h2 className="text-center text-xl font-semibold text-slate-900">What people are saying</h2>
+              <div className="mt-8 grid gap-6 sm:grid-cols-3">
+                {activeTestimonials.slice(0, 3).map((t) => (
+                  <figure key={t.id} className="rounded-xl border border-slate-200 bg-slate-50 p-6">
+                    <blockquote className="text-sm text-slate-700">&ldquo;{t.quote}&rdquo;</blockquote>
+                    <figcaption className="mt-4 text-sm font-medium text-slate-900">
+                      {t.authorName}
+                      {t.authorRole && <span className="block font-normal text-slate-500">{t.authorRole}</span>}
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="border-t border-slate-200 bg-slate-50">
           <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-14 text-center sm:px-6">
