@@ -27,7 +27,7 @@ const STEPS = [
   },
   {
     title: "5. We help close the deal",
-    body: "Once a conversation is underway, our team can help with the practical side -- references, relocation support, and anything else that comes up moving from a first message to a signed player.",
+    body: "Once a conversation is underway, our team can help with the practical side -- references, relocation support, and anything else that comes up moving from a first message to a signed player or coach.",
   },
 ];
 
@@ -63,6 +63,12 @@ export default function HowItWorksPage() {
                 className="rounded-md border border-brand-navy px-5 py-2.5 text-sm font-semibold text-brand-navy hover:bg-brand-navy hover:text-white"
               >
                 Join as a player
+              </Link>
+              <Link
+                href="/join/coach"
+                className="rounded-md border border-brand-navy px-5 py-2.5 text-sm font-semibold text-brand-navy hover:bg-brand-navy hover:text-white"
+              >
+                Join as a coach
               </Link>
               <Link
                 href="/join/club"

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { and, desc, eq, ilike, notInArray } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, notInArray } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { clubs, positionNeeds } from "@/lib/db/schema";
 import { SiteHeader } from "@/components/public/site-header";
@@ -18,9 +18,10 @@ export const metadata: Metadata = {
 export default async function PositionsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; country?: string; level?: string }>;
+  searchParams: Promise<{ q?: string; country?: string; level?: string; sort?: string }>;
 }) {
-  const { q, country, level } = await searchParams;
+  const { q, country, level, sort } = await searchParams;
+  const sortOldestFirst = sort === "oldest";
 
   const conditions = [
     eq(positionNeeds.filled, false),
@@ -48,7 +49,7 @@ export default async function PositionsPage({
     .from(positionNeeds)
     .innerJoin(clubs, eq(positionNeeds.clubId, clubs.id))
     .where(and(...conditions))
-    .orderBy(desc(positionNeeds.openSince))
+    .orderBy(sortOldestFirst ? asc(positionNeeds.openSince) : desc(positionNeeds.openSince))
     .limit(60);
 
   return (
@@ -94,6 +95,17 @@ export default async function PositionsPage({
                   {PLAYER_LEVEL_LABELS[l]}
                 </option>
               ))}
+            </select>
+          </div>
+          <div className="min-w-[160px]">
+            <label className="block text-xs font-medium text-slate-500">Sort by</label>
+            <select
+              name="sort"
+              defaultValue={sortOldestFirst ? "oldest" : "newest"}
+              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+            >
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
             </select>
           </div>
           <div className="flex items-end">
