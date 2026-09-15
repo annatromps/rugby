@@ -41,6 +41,14 @@ export default async function AdminLayout({
           <header className="flex h-14 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-6">
             <p className="text-sm font-semibold text-brand-navy sm:hidden">Kickoff Rugby Recruitment</p>
             <div className="ml-auto flex items-center gap-3">
+              <Link
+                href="/"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="text-sm font-medium text-slate-500 hover:text-brand-navy"
+              >
+                View site &#8599;
+              </Link>
               <span className="hidden text-sm text-slate-600 sm:inline">{admin.name}</span>
               <form action={logout}>
                 <button
