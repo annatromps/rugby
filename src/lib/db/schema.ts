@@ -265,6 +265,27 @@ export const sourcingSuggestions = pgTable("sourcing_suggestions", {
   promotedPlayerId: text("promoted_player_id"),
 });
 
+// ---------- Email outreach templates ----------
+
+// Reusable drafts an admin can send from a club/player's row with one
+// click. Uses {{variableName}} placeholders (see src/lib/email-templates.ts
+// for the render logic and the list of variables available per target
+// type), filled in per-recipient in the compose modal before the admin
+// opens their email client -- nothing is ever sent server-side.
+export const emailTemplates = pgTable("email_templates", {
+  id: id(),
+  targetType: searchTargetTypeEnum("target_type").notNull(),
+  name: text("name").notNull(),
+  subject: text("subject").notNull(),
+  body: text("body").notNull(),
+  // The template pre-selected by default when an admin clicks "Email" on a
+  // club/player of this targetType. At most one template per targetType
+  // should have this set -- enforced in the server action, not the DB.
+  isDefault: boolean("is_default").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // ---------- Relations (for Drizzle's relational query API) ----------
 
 export const clubsRelations = relations(clubs, ({ many }) => ({

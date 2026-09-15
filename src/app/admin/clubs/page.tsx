@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { and, count, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { clubs } from "@/lib/db/schema";
+import { clubs, emailTemplates } from "@/lib/db/schema";
 import { ClubStatusSelect } from "@/components/admin/club-status-select";
 import { ClubPublishToggle } from "@/components/admin/club-publish-toggle";
+import { EmailComposeButton } from "@/components/admin/email-compose-button";
+import { buildClubVariables } from "@/lib/email-templates";
+import { requireAdmin } from "@/lib/auth/dal";
 import { RECORD_STATUSES } from "@/lib/constants";
 
 export default async function ClubsPage({
@@ -14,7 +17,8 @@ export default async function ClubsPage({
   const { status, pending } = await searchParams;
   const showPendingOnly = pending === "1";
 
-  const [rows, [pendingCountRow]] = await Promise.all([
+  const [admin, rows, [pendingCountRow], clubTemplates] = await Promise.all([
+    requireAdmin(),
     db
       .select()
       .from(clubs)
@@ -30,6 +34,7 @@ export default async function ClubsPage({
       .select({ value: count() })
       .from(clubs)
       .where(and(eq(clubs.source, "SELF_SUBMITTED"), eq(clubs.isPublished, false))),
+    db.select().from(emailTemplates).where(eq(emailTemplates.targetType, "CLUB")),
   ]);
   const pendingCount = pendingCountRow?.value ?? 0;
 
@@ -102,12 +107,13 @@ export default async function ClubsPage({
               <th className="px-4 py-3 font-medium">Source</th>
               <th className="px-4 py-3 font-medium">Published</th>
               <th className="px-4 py-3 font-medium">Status</th>
+              <th className="px-4 py-3 font-medium">Contact</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {rows.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-sm text-slate-400">
+                <td colSpan={6} className="px-4 py-8 text-center text-sm text-slate-400">
                   {showPendingOnly ? (
                     "Nothing waiting for review right now."
                   ) : (
@@ -143,6 +149,14 @@ export default async function ClubsPage({
                 </td>
                 <td className="px-4 py-3">
                   <ClubStatusSelect clubId={club.id} status={club.status} />
+                </td>
+                <td className="px-4 py-3">
+                  <EmailComposeButton
+                    recipientEmail={club.contactEmail}
+                    recipientLabel={club.name}
+                    templates={clubTemplates}
+                    variables={buildClubVariables(club, admin.name)}
+                  />
                 </td>
               </tr>
             ))}

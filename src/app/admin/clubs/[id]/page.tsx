@@ -1,11 +1,14 @@
 import { notFound } from "next/navigation";
 import { eq, desc } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { clubs, positionNeeds, contactLogs, placements, players } from "@/lib/db/schema";
+import { clubs, positionNeeds, contactLogs, placements, players, emailTemplates } from "@/lib/db/schema";
 import { logClubContact } from "@/app/actions/clubs";
 import { ClubStatusSelect } from "@/components/admin/club-status-select";
 import { ClubPublishToggle } from "@/components/admin/club-publish-toggle";
 import { ClubVerifiedToggle } from "@/components/admin/club-verified-toggle";
+import { EmailComposeButton } from "@/components/admin/email-compose-button";
+import { buildClubVariables } from "@/lib/email-templates";
+import { requireAdmin } from "@/lib/auth/dal";
 import { ClubEditForm } from "./club-edit-form";
 import { AddPositionForm, PositionsList } from "./positions";
 import { AddContactLogForm, ContactLogList } from "@/components/admin/contact-log";
@@ -20,7 +23,7 @@ export default async function ClubDetailPage({
   const [club] = await db.select().from(clubs).where(eq(clubs.id, id)).limit(1);
   if (!club) notFound();
 
-  const [needs, logs, clubPlacements] = await Promise.all([
+  const [needs, logs, clubPlacements, admin, clubTemplates] = await Promise.all([
     db.select().from(positionNeeds).where(eq(positionNeeds.clubId, id)),
     db
       .select()
@@ -39,6 +42,8 @@ export default async function ClubDetailPage({
       .from(placements)
       .innerJoin(players, eq(placements.playerId, players.id))
       .where(eq(placements.clubId, id)),
+    requireAdmin(),
+    db.select().from(emailTemplates).where(eq(emailTemplates.targetType, "CLUB")),
   ]);
 
   return (
@@ -57,6 +62,12 @@ export default async function ClubDetailPage({
           )}
           <ClubVerifiedToggle clubId={club.id} isVerified={club.isVerified} />
           <ClubStatusSelect clubId={club.id} status={club.status} />
+          <EmailComposeButton
+            recipientEmail={club.contactEmail}
+            recipientLabel={club.name}
+            templates={clubTemplates}
+            variables={buildClubVariables(club, admin.name)}
+          />
         </div>
       </div>
 

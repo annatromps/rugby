@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { and, count, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { players } from "@/lib/db/schema";
+import { players, emailTemplates } from "@/lib/db/schema";
 import { PlayerStatusSelect } from "@/components/admin/player-status-select";
 import { PlayerPublishToggle } from "@/components/admin/player-publish-toggle";
+import { EmailComposeButton } from "@/components/admin/email-compose-button";
+import { buildPlayerVariables } from "@/lib/email-templates";
+import { requireAdmin } from "@/lib/auth/dal";
 import { RECORD_STATUSES } from "@/lib/constants";
 
 export default async function PlayersPage({
@@ -14,7 +17,8 @@ export default async function PlayersPage({
   const { status, pending } = await searchParams;
   const showPendingOnly = pending === "1";
 
-  const [rows, [pendingCountRow]] = await Promise.all([
+  const [admin, rows, [pendingCountRow], playerTemplates] = await Promise.all([
+    requireAdmin(),
     db
       .select()
       .from(players)
@@ -30,6 +34,7 @@ export default async function PlayersPage({
       .select({ value: count() })
       .from(players)
       .where(and(eq(players.source, "SELF_SUBMITTED"), eq(players.isPublished, false))),
+    db.select().from(emailTemplates).where(eq(emailTemplates.targetType, "PLAYER")),
   ]);
   const pendingCount = pendingCountRow?.value ?? 0;
 
@@ -103,12 +108,13 @@ export default async function PlayersPage({
               <th className="px-4 py-3 font-medium">Accommodation</th>
               <th className="px-4 py-3 font-medium">Published</th>
               <th className="px-4 py-3 font-medium">Status</th>
+              <th className="px-4 py-3 font-medium">Contact</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {rows.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-sm text-slate-400">
+                <td colSpan={7} className="px-4 py-8 text-center text-sm text-slate-400">
                   {showPendingOnly ? (
                     "Nothing waiting for review right now."
                   ) : (
@@ -144,6 +150,14 @@ export default async function PlayersPage({
                 </td>
                 <td className="px-4 py-3">
                   <PlayerStatusSelect playerId={player.id} status={player.status} />
+                </td>
+                <td className="px-4 py-3">
+                  <EmailComposeButton
+                    recipientEmail={player.email}
+                    recipientLabel={`${player.firstName} ${player.lastName}`}
+                    templates={playerTemplates}
+                    variables={buildPlayerVariables(player, admin.name)}
+                  />
                 </td>
               </tr>
             ))}

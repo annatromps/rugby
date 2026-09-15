@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { href: "/admin/clubs", label: "Clubs" },
   { href: "/admin/players", label: "Players" },
   { href: "/admin/sourcing", label: "AI Sourcing" },
+  { href: "/admin/settings/email-templates", label: "Email Templates" },
 ];
 
 export function AdminNav({ className = "" }: { className?: string }) {

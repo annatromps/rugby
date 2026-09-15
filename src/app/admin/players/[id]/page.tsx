@@ -1,11 +1,14 @@
 import { notFound } from "next/navigation";
 import { eq, desc } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { players, contactLogs, accommodationRequests, placements, clubs } from "@/lib/db/schema";
+import { players, contactLogs, accommodationRequests, placements, clubs, emailTemplates } from "@/lib/db/schema";
 import { logPlayerContact } from "@/app/actions/players";
 import { PlayerStatusSelect } from "@/components/admin/player-status-select";
 import { PlayerPublishToggle } from "@/components/admin/player-publish-toggle";
 import { PlayerVerifiedToggle } from "@/components/admin/player-verified-toggle";
+import { EmailComposeButton } from "@/components/admin/email-compose-button";
+import { buildPlayerVariables } from "@/lib/email-templates";
+import { requireAdmin } from "@/lib/auth/dal";
 import { AddContactLogForm, ContactLogList } from "@/components/admin/contact-log";
 import { PlayerEditForm } from "./player-edit-form";
 import { AccommodationList } from "./accommodation";
@@ -20,7 +23,7 @@ export default async function PlayerDetailPage({
   const [player] = await db.select().from(players).where(eq(players.id, id)).limit(1);
   if (!player) notFound();
 
-  const [logs, accommodation, playerPlacements] = await Promise.all([
+  const [logs, accommodation, playerPlacements, admin, playerTemplates] = await Promise.all([
     db
       .select()
       .from(contactLogs)
@@ -41,6 +44,8 @@ export default async function PlayerDetailPage({
       .from(placements)
       .innerJoin(clubs, eq(placements.clubId, clubs.id))
       .where(eq(placements.playerId, id)),
+    requireAdmin(),
+    db.select().from(emailTemplates).where(eq(emailTemplates.targetType, "PLAYER")),
   ]);
 
   return (
@@ -61,6 +66,12 @@ export default async function PlayerDetailPage({
           )}
           <PlayerVerifiedToggle playerId={player.id} isVerified={player.isVerified} />
           <PlayerStatusSelect playerId={player.id} status={player.status} />
+          <EmailComposeButton
+            recipientEmail={player.email}
+            recipientLabel={`${player.firstName} ${player.lastName}`}
+            templates={playerTemplates}
+            variables={buildPlayerVariables(player, admin.name)}
+          />
         </div>
       </div>
 

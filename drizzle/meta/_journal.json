@@ -29,6 +29,13 @@
       "when": 1789420323831,
       "tag": "0003_wide_nebula",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789464721961,
+      "tag": "0004_careful_black_crow",
+      "breakpoints": true
     }
   ]
 }
