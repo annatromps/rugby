@@ -7,6 +7,7 @@ import { coaches } from "@/lib/db/schema";
 import { SiteHeader } from "@/components/public/site-header";
 import { SiteFooter } from "@/components/public/site-footer";
 import { VerifiedBadge } from "@/components/public/verified-badge";
+import { Avatar } from "@/components/public/avatar";
 import { InquiryForm } from "@/components/public/inquiry-form";
 import { submitInquiry } from "@/app/actions/public";
 
@@ -59,11 +60,19 @@ export default async function CoachProfilePage({
 
         <div className="mt-4 grid gap-8 sm:grid-cols-3">
           <div className="sm:col-span-2">
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-2xl font-bold text-slate-900">
-                {coach.firstName} {coach.lastName}
-              </h1>
-              {coach.isVerified && <VerifiedBadge />}
+            <div className="flex flex-wrap items-center gap-4">
+              <Avatar
+                src={coach.photoUrl}
+                alt={`${coach.firstName} ${coach.lastName}`}
+                initials={`${coach.firstName[0] ?? ""}${coach.lastName[0] ?? ""}`}
+                size={72}
+              />
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="text-2xl font-bold text-slate-900">
+                  {coach.firstName} {coach.lastName}
+                </h1>
+                {coach.isVerified && <VerifiedBadge />}
+              </div>
             </div>
             <p className="mt-1 text-lg font-medium text-brand-coral">{coach.specialization}</p>
 

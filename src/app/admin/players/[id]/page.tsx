@@ -11,6 +11,7 @@ import { buildPlayerVariables } from "@/lib/email-templates";
 import { requireAdmin } from "@/lib/auth/dal";
 import { AddContactLogForm, ContactLogList } from "@/components/admin/contact-log";
 import { PlayerEditForm } from "./player-edit-form";
+import { PlayerPhotoUpload } from "@/components/admin/player-photo-upload";
 import { AccommodationList } from "./accommodation";
 
 export default async function PlayerDetailPage({
@@ -74,6 +75,10 @@ export default async function PlayerDetailPage({
           />
         </div>
       </div>
+
+      <Section title="Photo">
+        <PlayerPhotoUpload playerId={player.id} photoUrl={player.photoUrl} />
+      </Section>
 
       <Section title="Details">
         <PlayerEditForm player={player} />

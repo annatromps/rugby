@@ -11,6 +11,7 @@ import { buildCoachVariables } from "@/lib/email-templates";
 import { requireAdmin } from "@/lib/auth/dal";
 import { AddContactLogForm, ContactLogList } from "@/components/admin/contact-log";
 import { CoachEditForm } from "./coach-edit-form";
+import { CoachPhotoUpload } from "@/components/admin/coach-photo-upload";
 
 export default async function CoachDetailPage({
   params,
@@ -58,6 +59,10 @@ export default async function CoachDetailPage({
           />
         </div>
       </div>
+
+      <Section title="Photo">
+        <CoachPhotoUpload coachId={coach.id} photoUrl={coach.photoUrl} />
+      </Section>
 
       <Section title="Details">
         <CoachEditForm coach={coach} />

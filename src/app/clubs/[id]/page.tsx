@@ -8,10 +8,21 @@ import { SiteHeader } from "@/components/public/site-header";
 import { SiteFooter } from "@/components/public/site-footer";
 import { LevelBadge } from "@/components/public/level-badge";
 import { VerifiedBadge } from "@/components/public/verified-badge";
+import { Avatar } from "@/components/public/avatar";
 import { InquiryForm } from "@/components/public/inquiry-form";
 import { submitInquiry } from "@/app/actions/public";
 
 const PUBLIC_EXCLUDED_STATUSES = new Set(["ARCHIVED", "PLACED"]);
+
+function clubInitials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
+}
 
 async function getPublicClub(id: string) {
   const [club] = await db.select().from(clubs).where(eq(clubs.id, id)).limit(1);
@@ -65,10 +76,13 @@ export default async function ClubProfilePage({
 
         <div className="mt-4 grid gap-8 sm:grid-cols-3">
           <div className="sm:col-span-2">
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-2xl font-bold text-slate-900">{club.name}</h1>
-              <LevelBadge level={club.level} />
-              {club.isVerified && <VerifiedBadge />}
+            <div className="flex flex-wrap items-center gap-4">
+              <Avatar src={club.crestUrl} alt={club.name} initials={clubInitials(club.name)} size={72} shape="square" />
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="text-2xl font-bold text-slate-900">{club.name}</h1>
+                <LevelBadge level={club.level} />
+                {club.isVerified && <VerifiedBadge />}
+              </div>
             </div>
             <p className="mt-1 text-sm text-slate-500">
               {[club.region, club.country].filter(Boolean).join(", ")}

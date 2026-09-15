@@ -10,6 +10,7 @@ import { EmailComposeButton } from "@/components/admin/email-compose-button";
 import { buildClubVariables } from "@/lib/email-templates";
 import { requireAdmin } from "@/lib/auth/dal";
 import { ClubEditForm } from "./club-edit-form";
+import { ClubCrestUpload } from "@/components/admin/club-crest-upload";
 import { AddPositionForm, PositionsList } from "./positions";
 import { AddContactLogForm, ContactLogList } from "@/components/admin/contact-log";
 
@@ -70,6 +71,10 @@ export default async function ClubDetailPage({
           />
         </div>
       </div>
+
+      <Section title="Crest">
+        <ClubCrestUpload clubId={club.id} crestUrl={club.crestUrl} />
+      </Section>
 
       <Section title="Details">
         <ClubEditForm club={club} />

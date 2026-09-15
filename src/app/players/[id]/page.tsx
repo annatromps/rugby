@@ -8,6 +8,7 @@ import { SiteHeader } from "@/components/public/site-header";
 import { SiteFooter } from "@/components/public/site-footer";
 import { LevelBadge } from "@/components/public/level-badge";
 import { VerifiedBadge } from "@/components/public/verified-badge";
+import { Avatar } from "@/components/public/avatar";
 import { InquiryForm } from "@/components/public/inquiry-form";
 import { submitInquiry } from "@/app/actions/public";
 
@@ -60,12 +61,20 @@ export default async function PlayerProfilePage({
 
         <div className="mt-4 grid gap-8 sm:grid-cols-3">
           <div className="sm:col-span-2">
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-2xl font-bold text-slate-900">
-                {player.firstName} {player.lastName}
-              </h1>
-              <LevelBadge level={player.level} />
-              {player.isVerified && <VerifiedBadge />}
+            <div className="flex flex-wrap items-center gap-4">
+              <Avatar
+                src={player.photoUrl}
+                alt={`${player.firstName} ${player.lastName}`}
+                initials={`${player.firstName[0] ?? ""}${player.lastName[0] ?? ""}`}
+                size={72}
+              />
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="text-2xl font-bold text-slate-900">
+                  {player.firstName} {player.lastName}
+                </h1>
+                <LevelBadge level={player.level} />
+                {player.isVerified && <VerifiedBadge />}
+              </div>
             </div>
             <p className="mt-1 text-lg font-medium text-brand-coral">
               {player.position}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { VerifiedBadge } from "./verified-badge";
+import { Avatar } from "./avatar";
 import type { coaches } from "@/lib/db/schema";
 
 type Coach = typeof coaches.$inferSelect;
@@ -11,10 +12,18 @@ export function CoachCard({ coach }: { coach: Coach }) {
       className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-brand-navy/40 hover:shadow-md"
     >
       <div className="flex items-start justify-between gap-2">
-        <h3 className="flex items-center gap-2 font-semibold text-slate-900">
-          {coach.firstName} {coach.lastName}
-          {coach.isVerified && <VerifiedBadge />}
-        </h3>
+        <div className="flex items-center gap-3">
+          <Avatar
+            src={coach.photoUrl}
+            alt={`${coach.firstName} ${coach.lastName}`}
+            initials={`${coach.firstName[0] ?? ""}${coach.lastName[0] ?? ""}`}
+            size={44}
+          />
+          <h3 className="flex items-center gap-2 font-semibold text-slate-900">
+            {coach.firstName} {coach.lastName}
+            {coach.isVerified && <VerifiedBadge />}
+          </h3>
+        </div>
         {coach.coachingLevel && (
           <span className="inline-flex items-center rounded-full bg-brand-navy/10 px-2.5 py-0.5 text-xs font-medium text-brand-navy">
             {coach.coachingLevel}
