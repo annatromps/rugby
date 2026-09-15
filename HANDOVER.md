@@ -15,8 +15,8 @@ a custom domain, analytics, etc).
 ## 2. Vercel (hosting)
 
 - Project: `kickoff-rugby` under the `rugby4` Vercel team/account.
-- Live domains: `kickoff-rugby.vercel.app` and `rugby-snowy.vercel.app`
-  (both point at the same production deployment).
+- Live domain: `kickoff-rugby.vercel.app` (the original `rugby-snowy.vercel.app`
+  domain has been retired).
 - To hand over: either transfer the project to the new owner's Vercel
   account (Settings > General > Transfer Project), or have them create
   their own Vercel account, connect it to the (transferred) GitHub repo,
