@@ -10,7 +10,9 @@ import { LevelBadge } from "@/components/public/level-badge";
 import { VerifiedBadge } from "@/components/public/verified-badge";
 import { Avatar } from "@/components/public/avatar";
 import { InquiryForm } from "@/components/public/inquiry-form";
+import { SignUpGate } from "@/components/public/sign-up-gate";
 import { submitInquiry } from "@/app/actions/public";
+import { getPortalAccount } from "@/lib/auth/portal-dal";
 
 const PUBLIC_EXCLUDED_STATUSES = new Set(["ARCHIVED", "PLACED"]);
 
@@ -56,7 +58,7 @@ export default async function ClubProfilePage({
 }) {
   const { id } = await params;
 
-  const club = await getPublicClub(id);
+  const [club, account] = await Promise.all([getPublicClub(id), getPortalAccount()]);
   if (!club) notFound();
 
   const openPositions = await db
@@ -130,7 +132,11 @@ export default async function ClubProfilePage({
           </div>
 
           <div>
-            <InquiryForm action={inquiryAction} heading="Interested? Send a message" />
+            {account ? (
+              <InquiryForm action={inquiryAction} heading="Interested? Send a message" />
+            ) : (
+              <SignUpGate heading="Interested? Send a message" />
+            )}
           </div>
         </div>
       </main>

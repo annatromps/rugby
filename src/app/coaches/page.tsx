@@ -6,6 +6,7 @@ import { coaches } from "@/lib/db/schema";
 import { SiteHeader } from "@/components/public/site-header";
 import { SiteFooter } from "@/components/public/site-footer";
 import { CoachCard } from "@/components/public/coach-card";
+import { getPortalAccount } from "@/lib/auth/portal-dal";
 
 const PUBLIC_EXCLUDED_STATUSES: Array<"ARCHIVED" | "PLACED"> = ["ARCHIVED", "PLACED"];
 
@@ -20,6 +21,7 @@ export default async function CoachesPage({
   searchParams: Promise<{ q?: string; country?: string }>;
 }) {
   const { q, country } = await searchParams;
+  const account = await getPortalAccount();
 
   const conditions = [
     eq(coaches.isPublished, true),
@@ -84,7 +86,7 @@ export default async function CoachesPage({
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {rows.map((coach) => (
-              <CoachCard key={coach.id} coach={coach} />
+              <CoachCard key={coach.id} coach={coach} loggedIn={!!account} />
             ))}
           </div>
         )}

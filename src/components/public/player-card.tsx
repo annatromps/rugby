@@ -2,11 +2,13 @@ import Link from "next/link";
 import { LevelBadge } from "./level-badge";
 import { VerifiedBadge } from "./verified-badge";
 import { Avatar } from "./avatar";
+import { fuzzName } from "@/lib/fuzz-name";
 import type { players } from "@/lib/db/schema";
 
 type Player = typeof players.$inferSelect;
 
-export function PlayerCard({ player }: { player: Player }) {
+export function PlayerCard({ player, loggedIn }: { player: Player; loggedIn: boolean }) {
+  const displayName = loggedIn ? `${player.firstName} ${player.lastName}` : fuzzName(player.firstName, player.lastName);
   return (
     <Link
       href={`/players/${player.id}`}
@@ -15,13 +17,13 @@ export function PlayerCard({ player }: { player: Player }) {
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-3">
           <Avatar
-            src={player.photoUrl}
-            alt={`${player.firstName} ${player.lastName}`}
+            src={loggedIn ? player.photoUrl : null}
+            alt={displayName}
             initials={`${player.firstName[0] ?? ""}${player.lastName[0] ?? ""}`}
             size={44}
           />
           <h3 className="flex items-center gap-2 font-semibold text-slate-900">
-            {player.firstName} {player.lastName}
+            {displayName}
             {player.isVerified && <VerifiedBadge />}
           </h3>
         </div>

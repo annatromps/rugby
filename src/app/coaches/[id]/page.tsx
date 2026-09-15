@@ -9,7 +9,10 @@ import { SiteFooter } from "@/components/public/site-footer";
 import { VerifiedBadge } from "@/components/public/verified-badge";
 import { Avatar } from "@/components/public/avatar";
 import { InquiryForm } from "@/components/public/inquiry-form";
+import { SignUpGate } from "@/components/public/sign-up-gate";
 import { submitInquiry } from "@/app/actions/public";
+import { getPortalAccount } from "@/lib/auth/portal-dal";
+import { fuzzName } from "@/lib/fuzz-name";
 
 const PUBLIC_EXCLUDED_STATUSES = new Set(["ARCHIVED", "PLACED"]);
 
@@ -30,7 +33,7 @@ export async function generateMetadata({
   const coach = await getPublicCoach(id);
   if (!coach) return { title: "Coach not found" };
 
-  const title = `${coach.firstName} ${coach.lastName} -- ${coach.specialization}`;
+  const title = `${fuzzName(coach.firstName, coach.lastName)} -- ${coach.specialization}`;
   const description =
     [coach.currentCountry ? `Based in ${coach.currentCountry}` : null, coach.coachingLevel].filter(Boolean).join(" · ") ||
     "View this coach's profile on Kickoff Rugby Recruitment.";
@@ -45,10 +48,11 @@ export default async function CoachProfilePage({
 }) {
   const { id } = await params;
 
-  const coach = await getPublicCoach(id);
+  const [coach, account] = await Promise.all([getPublicCoach(id), getPortalAccount()]);
   if (!coach) notFound();
 
   const inquiryAction = submitInquiry.bind(null, { coachId: coach.id });
+  const displayName = account ? `${coach.firstName} ${coach.lastName}` : fuzzName(coach.firstName, coach.lastName);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -62,15 +66,13 @@ export default async function CoachProfilePage({
           <div className="sm:col-span-2">
             <div className="flex flex-wrap items-center gap-4">
               <Avatar
-                src={coach.photoUrl}
-                alt={`${coach.firstName} ${coach.lastName}`}
+                src={account ? coach.photoUrl : null}
+                alt={displayName}
                 initials={`${coach.firstName[0] ?? ""}${coach.lastName[0] ?? ""}`}
                 size={72}
               />
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-2xl font-bold text-slate-900">
-                  {coach.firstName} {coach.lastName}
-                </h1>
+                <h1 className="text-2xl font-bold text-slate-900">{displayName}</h1>
                 {coach.isVerified && <VerifiedBadge />}
               </div>
             </div>
@@ -131,7 +133,11 @@ export default async function CoachProfilePage({
           </div>
 
           <div>
-            <InquiryForm action={inquiryAction} heading="Interested? Send a message" />
+            {account ? (
+              <InquiryForm action={inquiryAction} heading="Interested? Send a message" />
+            ) : (
+              <SignUpGate heading="Interested? Send a message" />
+            )}
           </div>
         </div>
       </main>

@@ -10,7 +10,10 @@ import { LevelBadge } from "@/components/public/level-badge";
 import { VerifiedBadge } from "@/components/public/verified-badge";
 import { Avatar } from "@/components/public/avatar";
 import { InquiryForm } from "@/components/public/inquiry-form";
+import { SignUpGate } from "@/components/public/sign-up-gate";
 import { submitInquiry } from "@/app/actions/public";
+import { getPortalAccount } from "@/lib/auth/portal-dal";
+import { fuzzName } from "@/lib/fuzz-name";
 
 const PUBLIC_EXCLUDED_STATUSES = new Set(["ARCHIVED", "PLACED"]);
 
@@ -31,7 +34,7 @@ export async function generateMetadata({
   const player = await getPublicPlayer(id);
   if (!player) return { title: "Player not found" };
 
-  const title = `${player.firstName} ${player.lastName} -- ${player.position}`;
+  const title = `${fuzzName(player.firstName, player.lastName)} -- ${player.position}`;
   const description = [player.currentCountry ? `Based in ${player.currentCountry}` : null, player.level]
     .filter(Boolean)
     .join(" · ") || "View this player's profile on Kickoff Rugby Recruitment.";
@@ -46,10 +49,13 @@ export default async function PlayerProfilePage({
 }) {
   const { id } = await params;
 
-  const player = await getPublicPlayer(id);
+  const [player, account] = await Promise.all([getPublicPlayer(id), getPortalAccount()]);
   if (!player) notFound();
 
   const inquiryAction = submitInquiry.bind(null, { playerId: player.id });
+  const displayName = account
+    ? `${player.firstName} ${player.lastName}`
+    : fuzzName(player.firstName, player.lastName);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -63,15 +69,13 @@ export default async function PlayerProfilePage({
           <div className="sm:col-span-2">
             <div className="flex flex-wrap items-center gap-4">
               <Avatar
-                src={player.photoUrl}
-                alt={`${player.firstName} ${player.lastName}`}
+                src={account ? player.photoUrl : null}
+                alt={displayName}
                 initials={`${player.firstName[0] ?? ""}${player.lastName[0] ?? ""}`}
                 size={72}
               />
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-2xl font-bold text-slate-900">
-                  {player.firstName} {player.lastName}
-                </h1>
+                <h1 className="text-2xl font-bold text-slate-900">{displayName}</h1>
                 <LevelBadge level={player.level} />
                 {player.isVerified && <VerifiedBadge />}
               </div>
@@ -130,7 +134,11 @@ export default async function PlayerProfilePage({
           </div>
 
           <div>
-            <InquiryForm action={inquiryAction} heading="Interested? Send a message" />
+            {account ? (
+              <InquiryForm action={inquiryAction} heading="Interested? Send a message" />
+            ) : (
+              <SignUpGate heading="Interested? Send a message" />
+            )}
           </div>
         </div>
       </main>

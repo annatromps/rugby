@@ -6,6 +6,7 @@ import { players } from "@/lib/db/schema";
 import { SiteHeader } from "@/components/public/site-header";
 import { SiteFooter } from "@/components/public/site-footer";
 import { PlayerCard } from "@/components/public/player-card";
+import { getPortalAccount } from "@/lib/auth/portal-dal";
 import { PLAYER_LEVELS, PLAYER_LEVEL_LABELS } from "@/lib/constants";
 
 const PUBLIC_EXCLUDED_STATUSES: Array<"ARCHIVED" | "PLACED"> = ["ARCHIVED", "PLACED"];
@@ -21,6 +22,7 @@ export default async function PlayersPage({
   searchParams: Promise<{ q?: string; country?: string; level?: string }>;
 }) {
   const { q, country, level } = await searchParams;
+  const account = await getPortalAccount();
 
   const conditions = [
     eq(players.isPublished, true),
@@ -105,7 +107,7 @@ export default async function PlayersPage({
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {rows.map((player) => (
-              <PlayerCard key={player.id} player={player} />
+              <PlayerCard key={player.id} player={player} loggedIn={!!account} />
             ))}
           </div>
         )}

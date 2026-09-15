@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { VerifiedBadge } from "./verified-badge";
 import { Avatar } from "./avatar";
+import { fuzzName } from "@/lib/fuzz-name";
 import type { coaches } from "@/lib/db/schema";
 
 type Coach = typeof coaches.$inferSelect;
 
-export function CoachCard({ coach }: { coach: Coach }) {
+export function CoachCard({ coach, loggedIn }: { coach: Coach; loggedIn: boolean }) {
+  const displayName = loggedIn ? `${coach.firstName} ${coach.lastName}` : fuzzName(coach.firstName, coach.lastName);
   return (
     <Link
       href={`/coaches/${coach.id}`}
@@ -14,13 +16,13 @@ export function CoachCard({ coach }: { coach: Coach }) {
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-3">
           <Avatar
-            src={coach.photoUrl}
-            alt={`${coach.firstName} ${coach.lastName}`}
+            src={loggedIn ? coach.photoUrl : null}
+            alt={displayName}
             initials={`${coach.firstName[0] ?? ""}${coach.lastName[0] ?? ""}`}
             size={44}
           />
           <h3 className="flex items-center gap-2 font-semibold text-slate-900">
-            {coach.firstName} {coach.lastName}
+            {displayName}
             {coach.isVerified && <VerifiedBadge />}
           </h3>
         </div>

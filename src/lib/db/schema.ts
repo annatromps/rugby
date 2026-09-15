@@ -29,6 +29,21 @@ const id = () =>
     .primaryKey()
     .$defaultFn(() => createId());
 
+// ---------- Public visitor accounts ----------
+// A free account a site visitor creates to unlock full names and contact
+// forms on player/coach/club profiles (see getPortalAccount()). Deliberately
+// separate from adminUsers below (site staff) and from the accountTypeEnum
+// further down (a club/player/coach's own future self-serve login) -- this
+// is just "signed up to browse", nothing more.
+
+export const accounts = pgTable("accounts", {
+  id: id(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // ---------- Admin ----------
 
 export const adminRoleEnum = pgEnum("admin_role", ["OWNER", "STAFF"]);
