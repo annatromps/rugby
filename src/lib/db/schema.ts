@@ -80,6 +80,10 @@ export const clubs = pgTable("clubs", {
   league: text("league"),
   level: playerLevelEnum("level"),
   website: text("website"),
+  // Club crest/badge image, uploaded by an admin via Vercel Blob. Shown on
+  // the public club card and profile page next to the name; null shows a
+  // plain text fallback there.
+  crestUrl: text("crest_url"),
   contactName: text("contact_name"),
   contactEmail: text("contact_email"),
   contactPhone: text("contact_phone"),
@@ -96,6 +100,10 @@ export const clubs = pgTable("clubs", {
   // real contact) -- shown as a badge on the public site to build trust
   // in a brand-new marketplace with no reputation history yet.
   isVerified: boolean("is_verified").notNull().default(false),
+  // Self-serve portal login (see src/lib/auth/portal.ts). Null until the
+  // club sets a password -- either at self-sign-up time or later via
+  // "claim this listing" on their public profile page.
+  passwordHash: text("password_hash"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -123,6 +131,9 @@ export const players = pgTable("players", {
   currentCountry: text("current_country"),
   position: text("position").notNull(), // primary playing position
   secondaryPosition: text("secondary_position"),
+  // Headshot, uploaded by an admin via Vercel Blob. Shown on the public
+  // player card and profile page; null shows a plain initials fallback.
+  photoUrl: text("photo_url"),
   level: playerLevelEnum("level"),
   currentClub: text("current_club"), // free-text, may not be in our clubs table
   yearsExperience: integer("years_experience"),
@@ -136,6 +147,37 @@ export const players = pgTable("players", {
   isPublished: boolean("is_published").notNull().default(true),
   // See the matching comment on clubs.isVerified above.
   isVerified: boolean("is_verified").notNull().default(false),
+  // See the matching comment on clubs.passwordHash above.
+  passwordHash: text("password_hash"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// Coaches -- the third marketplace persona alongside clubs and players.
+// Deliberately mirrors the players table's shape (status/source/publish/
+// verify/portal-login all work identically) rather than introducing a
+// different pattern for one entity type.
+export const coaches = pgTable("coaches", {
+  id: id(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  email: text("email"),
+  phone: text("phone"),
+  nationality: text("nationality"),
+  currentCountry: text("current_country"),
+  specialization: text("specialization").notNull(), // e.g. "Head coach", "Forwards", "Strength & conditioning"
+  coachingLevel: text("coaching_level"), // free text certification, e.g. "World Rugby Level 2"
+  currentClub: text("current_club"),
+  yearsExperience: integer("years_experience"),
+  highlightUrl: text("highlight_url"),
+  photoUrl: text("photo_url"),
+  notes: text("notes"),
+  status: recordStatusEnum("status").notNull().default("NEW"),
+  source: sourceTypeEnum("source").notNull().default("MANUAL"),
+  sourceDetail: text("source_detail"),
+  isPublished: boolean("is_published").notNull().default(true),
+  isVerified: boolean("is_verified").notNull().default(false),
+  passwordHash: text("password_hash"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -154,6 +196,9 @@ export const contactLogs = pgTable("contact_logs", {
   id: id(),
   clubId: text("club_id").references(() => clubs.id, { onDelete: "cascade" }),
   playerId: text("player_id").references(() => players.id, {
+    onDelete: "cascade",
+  }),
+  coachId: text("coach_id").references(() => coaches.id, {
     onDelete: "cascade",
   }),
   adminId: text("admin_id").references(() => adminUsers.id),
@@ -228,6 +273,7 @@ export const rateLimitEvents = pgTable("rate_limit_events", {
 export const searchTargetTypeEnum = pgEnum("search_target_type", [
   "CLUB",
   "PLAYER",
+  "COACH",
 ]);
 
 export const suggestionReviewStatusEnum = pgEnum("suggestion_review_status", [
@@ -263,6 +309,7 @@ export const sourcingSuggestions = pgTable("sourcing_suggestions", {
   // set once an admin accepts the suggestion and turns it into a real record
   promotedClubId: text("promoted_club_id"),
   promotedPlayerId: text("promoted_player_id"),
+  promotedCoachId: text("promoted_coach_id"),
 });
 
 // ---------- Email outreach templates ----------
@@ -286,6 +333,78 @@ export const emailTemplates = pgTable("email_templates", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// ---------- Public marketing content (admin-editable) ----------
+
+// Pricing tiers shown on the public /pricing page. Seeded with placeholder
+// numbers -- editable from /admin/settings/pricing whenever a real pricing
+// model is decided.
+export const pricingPlans = pgTable("pricing_plans", {
+  id: id(),
+  name: text("name").notNull(),
+  priceLabel: text("price_label").notNull(), // free-text so "Free" / "$49" / "Custom" all work
+  billingPeriod: text("billing_period"), // e.g. "per month" -- null reads as one-time/custom
+  tagline: text("tagline"),
+  features: jsonb("features").notNull().default([]), // string[]
+  isFeatured: boolean("is_featured").notNull().default(false),
+  sortOrder: integer("sort_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// Quote cards shown on the public site. Seeded with clearly-placeholder
+// (Latin filler) text -- there isn't real customer volume yet to draw
+// genuine testimonials from. Editable from /admin/settings/testimonials so
+// real ones can replace them later.
+export const testimonials = pgTable("testimonials", {
+  id: id(),
+  quote: text("quote").notNull(),
+  authorName: text("author_name").notNull(),
+  authorRole: text("author_role"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ---------- Portal accounts & messaging ----------
+
+// A club, player, or coach's own self-serve login is just that record's
+// row (see passwordHash on each table) -- there's no separate "users"
+// table. This enum is only for tagging *which* table a portal session or
+// a message party refers to.
+export const accountTypeEnum = pgEnum("account_type", [
+  "CLUB",
+  "PLAYER",
+  "COACH",
+]);
+
+// One conversation thread between two portal accounts (a club and a
+// player, say). Deliberately not a foreign key to clubs/players/coaches
+// directly -- each party can be any of the three tables, so the type+id
+// pair is resolved in application code (src/lib/portal-messaging.ts).
+export const conversations = pgTable("conversations", {
+  id: id(),
+  partyAType: accountTypeEnum("party_a_type").notNull(),
+  partyAId: text("party_a_id").notNull(),
+  partyBType: accountTypeEnum("party_b_type").notNull(),
+  partyBId: text("party_b_id").notNull(),
+  lastMessageAt: timestamp("last_message_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const messages = pgTable("messages", {
+  id: id(),
+  conversationId: text("conversation_id")
+    .notNull()
+    .references(() => conversations.id, { onDelete: "cascade" }),
+  senderType: accountTypeEnum("sender_type").notNull(),
+  senderId: text("sender_id").notNull(),
+  body: text("body").notNull(),
+  readAt: timestamp("read_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // ---------- Relations (for Drizzle's relational query API) ----------
 
 export const clubsRelations = relations(clubs, ({ many }) => ({
@@ -298,6 +417,21 @@ export const playersRelations = relations(players, ({ many }) => ({
   contactLogs: many(contactLogs),
   placements: many(placements),
   accommodationRequests: many(accommodationRequests),
+}));
+
+export const coachesRelations = relations(coaches, ({ many }) => ({
+  contactLogs: many(contactLogs),
+}));
+
+export const conversationsRelations = relations(conversations, ({ many }) => ({
+  messages: many(messages),
+}));
+
+export const messagesRelations = relations(messages, ({ one }) => ({
+  conversation: one(conversations, {
+    fields: [messages.conversationId],
+    references: [conversations.id],
+  }),
 }));
 
 export const placementsRelations = relations(placements, ({ one, many }) => ({

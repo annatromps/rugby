@@ -4,7 +4,7 @@
 // the compose modal (a client component) re-renders the template live as
 // an admin edits it, using the exact same function the admin settings
 // preview uses.
-import type { clubs, players } from "@/lib/db/schema";
+import type { clubs, players, coaches } from "@/lib/db/schema";
 import { PLAYER_LEVEL_LABELS } from "@/lib/constants";
 
 export type TemplateVariable = { key: string; label: string; example: string };
@@ -32,8 +32,21 @@ export const PLAYER_TEMPLATE_VARIABLES: TemplateVariable[] = [
   { key: "adminName", label: "Your name", example: "Anna Trompetas" },
 ];
 
-export function templateVariablesFor(targetType: "CLUB" | "PLAYER"): TemplateVariable[] {
-  return targetType === "CLUB" ? CLUB_TEMPLATE_VARIABLES : PLAYER_TEMPLATE_VARIABLES;
+// Keep this in sync with buildCoachVariables below.
+export const COACH_TEMPLATE_VARIABLES: TemplateVariable[] = [
+  { key: "firstName", label: "First name", example: "Jamie" },
+  { key: "lastName", label: "Last name", example: "Taylor" },
+  { key: "specialization", label: "Specialization", example: "Forwards / scrum" },
+  { key: "coachingLevel", label: "Coaching level", example: "Level 3" },
+  { key: "currentClub", label: "Current club", example: "Bristol Bears Community" },
+  { key: "country", label: "Based in", example: "England" },
+  { key: "adminName", label: "Your name", example: "Anna Trompetas" },
+];
+
+export function templateVariablesFor(targetType: "CLUB" | "PLAYER" | "COACH"): TemplateVariable[] {
+  if (targetType === "CLUB") return CLUB_TEMPLATE_VARIABLES;
+  if (targetType === "COACH") return COACH_TEMPLATE_VARIABLES;
+  return PLAYER_TEMPLATE_VARIABLES;
 }
 
 // Replaces every {{key}} in `template` with vars[key], leaving unknown
@@ -49,6 +62,7 @@ export function renderTemplate(template: string, vars: Record<string, string>): 
 
 type Club = typeof clubs.$inferSelect;
 type Player = typeof players.$inferSelect;
+type Coach = typeof coaches.$inferSelect;
 
 export function buildClubVariables(club: Club, adminName: string): Record<string, string> {
   return {
@@ -70,6 +84,18 @@ export function buildPlayerVariables(player: Player, adminName: string): Record<
     level: player.level ? (PLAYER_LEVEL_LABELS[player.level] ?? player.level) : "",
     currentClub: player.currentClub ?? "",
     country: player.currentCountry ?? "",
+    adminName,
+  };
+}
+
+export function buildCoachVariables(coach: Coach, adminName: string): Record<string, string> {
+  return {
+    firstName: coach.firstName,
+    lastName: coach.lastName,
+    specialization: coach.specialization,
+    coachingLevel: coach.coachingLevel ?? "",
+    currentClub: coach.currentClub ?? "",
+    country: coach.currentCountry ?? "",
     adminName,
   };
 }

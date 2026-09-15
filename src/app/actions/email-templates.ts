@@ -8,7 +8,7 @@ import { db } from "@/lib/db";
 import { emailTemplates } from "@/lib/db/schema";
 import { requireAdmin } from "@/lib/auth/dal";
 
-const TARGET_TYPES = ["CLUB", "PLAYER"] as const;
+const TARGET_TYPES = ["CLUB", "PLAYER", "COACH"] as const;
 
 const TemplateSchema = z.object({
   targetType: z.enum(TARGET_TYPES),

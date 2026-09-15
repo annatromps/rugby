@@ -9,7 +9,7 @@ import type { emailTemplates } from "@/lib/db/schema";
 type Template = typeof emailTemplates.$inferSelect;
 
 export function EditTemplateForm({ template }: { template: Template }) {
-  const [targetType, setTargetType] = useState<"CLUB" | "PLAYER">(template.targetType);
+  const [targetType, setTargetType] = useState<"CLUB" | "PLAYER" | "COACH">(template.targetType);
   const boundUpdate = updateEmailTemplate.bind(null, template.id);
   const [state, action, pending] = useActionState(boundUpdate, undefined);
 
@@ -25,11 +25,12 @@ export function EditTemplateForm({ template }: { template: Template }) {
           <select
             name="targetType"
             value={targetType}
-            onChange={(e) => setTargetType(e.target.value as "CLUB" | "PLAYER")}
+            onChange={(e) => setTargetType(e.target.value as "CLUB" | "PLAYER" | "COACH")}
             className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
           >
             <option value="CLUB">Clubs</option>
             <option value="PLAYER">Players</option>
+            <option value="COACH">Coaches</option>
           </select>
         </div>
 

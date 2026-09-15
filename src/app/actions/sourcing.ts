@@ -6,7 +6,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { sourcingSearches, sourcingSuggestions, clubs, players } from "@/lib/db/schema";
 import { requireAdmin } from "@/lib/auth/dal";
-import { runSourcingSearch, MissingApiKeyError } from "@/lib/ai/sourcing";
+import { runSourcingSearch, MissingApiKeyError, SOURCING_LEVEL_VALUES } from "@/lib/ai/sourcing";
 
 const SearchSchema = z.object({
   targetType: z.enum(["CLUB", "PLAYER"]),
@@ -38,14 +38,28 @@ export async function runSearch(
 
     if (candidates.length > 0) {
       await db.insert(sourcingSuggestions).values(
-        candidates.map((c) => ({
-          searchId: search.id,
-          targetType,
-          name: c.name,
-          summary: c.summary,
-          sourceUrl: c.sourceUrl,
-          rawData: c.rawData ?? null,
-        })),
+        candidates.map((c) => {
+          // Structured fields the AI extracted (country, level, position,
+          // contact info, etc.) are folded into rawData here since the
+          // suggestions table only has one jsonb column to hold them --
+          // acceptSuggestion() reads them back out of rawData to
+          // autopopulate the real club/player record.
+          const {
+            name: _name,
+            summary: _summary,
+            sourceUrl: _sourceUrl,
+            rawData: _rawData,
+            ...structured
+          } = c;
+          return {
+            searchId: search.id,
+            targetType,
+            name: c.name,
+            summary: c.summary,
+            sourceUrl: c.sourceUrl,
+            rawData: { ...structured, ...(c.rawData ?? {}) },
+          };
+        }),
       );
     }
   } catch (err) {
@@ -81,12 +95,36 @@ export async function acceptSuggestion(suggestionId: string) {
 
   if (!suggestion) return;
 
+  // The AI sourcing search extracts structured fields when it found real
+  // evidence for them (see src/lib/ai/sourcing.ts); rawData carries those
+  // through from the search. Fall back to a clearly-marked placeholder
+  // only when nothing was found, so the admin knows what still needs
+  // filling in by hand -- rather than every accepted suggestion silently
+  // getting "Unknown".
+  const raw = (suggestion.rawData ?? {}) as Record<string, unknown>;
+  const str = (key: string) =>
+    typeof raw[key] === "string" && raw[key] ? (raw[key] as string) : undefined;
+  const num = (key: string) =>
+    typeof raw[key] === "number" ? (raw[key] as number) : undefined;
+  const level = (() => {
+    const v = str("level");
+    return v && (SOURCING_LEVEL_VALUES as readonly string[]).includes(v)
+      ? (v as (typeof SOURCING_LEVEL_VALUES)[number])
+      : undefined;
+  })();
+
   if (suggestion.targetType === "CLUB") {
     const [club] = await db
       .insert(clubs)
       .values({
         name: suggestion.name,
-        country: "Unknown", // admin should fill this in on the club's page
+        country: str("country") ?? "Unknown", // admin should fill this in if still missing
+        region: str("region"),
+        league: str("league"),
+        level,
+        website: str("website"),
+        contactEmail: str("contactEmail"),
+        contactPhone: str("contactPhone"),
         notes: suggestion.summary,
         source: "AI_SEARCH",
         sourceDetail: suggestion.sourceUrl ?? undefined,
@@ -104,7 +142,15 @@ export async function acceptSuggestion(suggestionId: string) {
       .values({
         firstName: firstName || suggestion.name,
         lastName: rest.join(" ") || "-",
-        position: "Unknown", // admin should fill this in on the player's page
+        email: str("contactEmail"),
+        phone: str("contactPhone"),
+        nationality: str("nationality"),
+        currentCountry: str("currentCountry"),
+        position: str("position") ?? "Unknown", // admin should fill this in if still missing
+        secondaryPosition: str("secondaryPosition"),
+        level,
+        currentClub: str("currentClub"),
+        yearsExperience: num("yearsExperience"),
         notes: suggestion.summary,
         source: "AI_SEARCH",
         sourceDetail: suggestion.sourceUrl ?? undefined,

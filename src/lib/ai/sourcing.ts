@@ -15,11 +15,40 @@ import "server-only";
 // for the current recommended model and update ANTHROPIC_MODEL in .env if needed.
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5";
 
+// Level strings the AI is asked to choose from -- must match the
+// player_level Postgres enum in src/lib/db/schema.ts.
+export const SOURCING_LEVEL_VALUES = [
+  "COMMUNITY",
+  "AMATEUR_LEAGUE",
+  "SEMI_PRO",
+  "PROFESSIONAL",
+  "INTERNATIONAL",
+] as const;
+export type SourcingLevel = (typeof SOURCING_LEVEL_VALUES)[number];
+
 export type SourcingCandidate = {
   name: string;
   summary: string;
   sourceUrl?: string;
   rawData?: Record<string, unknown>;
+  // Structured fields the AI extracts from its search, when it found real
+  // evidence for them -- used to autopopulate the record on accept instead
+  // of leaving placeholder "Unknown" values for the admin to fill in by
+  // hand. Every field is optional: the AI is instructed to omit anything
+  // it isn't confident about rather than guess.
+  country?: string; // clubs: country the club is based in
+  region?: string; // clubs: state/province/region
+  league?: string; // clubs: league or division name
+  website?: string; // clubs: club website
+  contactEmail?: string;
+  contactPhone?: string;
+  level?: SourcingLevel; // clubs and players: competitive level
+  position?: string; // players: primary playing position
+  secondaryPosition?: string; // players
+  nationality?: string; // players
+  currentCountry?: string; // players: country currently based in
+  currentClub?: string; // players: current club, free text
+  yearsExperience?: number; // players
 };
 
 export class MissingApiKeyError extends Error {
@@ -52,6 +81,62 @@ const CANDIDATE_LIST_TOOL = {
             sourceUrl: {
               type: "string" as const,
               description: "URL where this was found, so the admin can verify it.",
+            },
+            country: {
+              type: "string" as const,
+              description:
+                "CLUBS ONLY. Country the club is based in. Omit if not found -- never guess.",
+            },
+            region: {
+              type: "string" as const,
+              description: "CLUBS ONLY. State/province/region, if known.",
+            },
+            league: {
+              type: "string" as const,
+              description: "CLUBS ONLY. League or division name, if known.",
+            },
+            website: {
+              type: "string" as const,
+              description: "CLUBS ONLY. Club's official website, if found.",
+            },
+            contactEmail: {
+              type: "string" as const,
+              description: "Publicly listed contact email, if found.",
+            },
+            contactPhone: {
+              type: "string" as const,
+              description: "Publicly listed contact phone, if found.",
+            },
+            level: {
+              type: "string" as const,
+              enum: SOURCING_LEVEL_VALUES as unknown as string[],
+              description:
+                "Competitive level, only if there's clear evidence -- one of: " +
+                SOURCING_LEVEL_VALUES.join(", "),
+            },
+            position: {
+              type: "string" as const,
+              description: "PLAYERS ONLY. Primary playing position, if known.",
+            },
+            secondaryPosition: {
+              type: "string" as const,
+              description: "PLAYERS ONLY. Secondary position, if known.",
+            },
+            nationality: {
+              type: "string" as const,
+              description: "PLAYERS ONLY. Player's nationality, if known.",
+            },
+            currentCountry: {
+              type: "string" as const,
+              description: "PLAYERS ONLY. Country the player is currently based in.",
+            },
+            currentClub: {
+              type: "string" as const,
+              description: "PLAYERS ONLY. Player's current club, if known.",
+            },
+            yearsExperience: {
+              type: "number" as const,
+              description: "PLAYERS ONLY. Years of experience, if stated.",
             },
           },
           required: ["name", "summary"],
@@ -97,6 +182,7 @@ export async function runSourcingSearch(
             "",
             "Find up to 8 real, specific candidates (not generic advice). For each, note where you found it.",
             "Only include candidates you found real evidence for during your search -- never invent one.",
+            "Also fill in the structured fields on each candidate (country, level, position, contact info, etc.) whenever your search turned up clear evidence for them -- this saves the admin from re-researching what you already found. Leave a field out entirely if you're not confident, rather than guessing.",
             "When you're done searching, call return_candidates with your final list.",
           ].join("\n"),
         },

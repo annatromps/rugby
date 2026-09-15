@@ -36,6 +36,20 @@
       "when": 1789464721961,
       "tag": "0004_careful_black_crow",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1789465832440,
+      "tag": "0005_steep_gabe_jones",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1789469471516,
+      "tag": "0006_nice_black_bolt",
+      "breakpoints": true
     }
   ]
 }

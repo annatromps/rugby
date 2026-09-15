@@ -5,8 +5,8 @@ import { createEmailTemplate } from "@/app/actions/email-templates";
 import { templateVariablesFor } from "@/lib/email-templates";
 import { VariableReference } from "../variable-reference";
 
-export function NewTemplateForm({ initialType }: { initialType: "CLUB" | "PLAYER" }) {
-  const [targetType, setTargetType] = useState<"CLUB" | "PLAYER">(initialType);
+export function NewTemplateForm({ initialType }: { initialType: "CLUB" | "PLAYER" | "COACH" }) {
+  const [targetType, setTargetType] = useState<"CLUB" | "PLAYER" | "COACH">(initialType);
   const [state, action, pending] = useActionState(createEmailTemplate, undefined);
 
   return (
@@ -21,11 +21,12 @@ export function NewTemplateForm({ initialType }: { initialType: "CLUB" | "PLAYER
           <select
             name="targetType"
             value={targetType}
-            onChange={(e) => setTargetType(e.target.value as "CLUB" | "PLAYER")}
+            onChange={(e) => setTargetType(e.target.value as "CLUB" | "PLAYER" | "COACH")}
             className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
           >
             <option value="CLUB">Clubs</option>
             <option value="PLAYER">Players</option>
+            <option value="COACH">Coaches</option>
           </select>
         </div>
 
