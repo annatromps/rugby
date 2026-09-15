@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import type { PublicFormState } from "@/app/actions/public";
 
 export function InquiryForm({
@@ -11,6 +11,7 @@ export function InquiryForm({
   heading: string;
 }) {
   const [state, formAction, pending] = useActionState(action, undefined);
+  const [sendProfile, setSendProfile] = useState(false);
 
   if (state?.success) {
     return (
@@ -79,6 +80,34 @@ export function InquiryForm({
         />
         {state && "fieldErrors" in state && state.fieldErrors?.message && (
           <p className="mt-1 text-xs text-red-600">{state.fieldErrors.message[0]}</p>
+        )}
+      </div>
+
+      <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
+        <label className="flex items-start gap-2 text-sm text-slate-700">
+          <input
+            type="checkbox"
+            name="sendProfile"
+            checked={sendProfile}
+            onChange={(e) => setSendProfile(e.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-navy focus:ring-brand-navy"
+          />
+          Also send my profile for them to review
+        </label>
+        {sendProfile && (
+          <div className="mt-2">
+            <input
+              name="profileUrl"
+              placeholder="Link to your profile on this site"
+              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-navy focus:outline-none focus:ring-1 focus:ring-brand-navy"
+            />
+            <p className="mt-1 text-xs text-slate-400">
+              e.g. the address of your player or club page here on Kickoff Rugby Recruitment.
+            </p>
+            {state && "fieldErrors" in state && state.fieldErrors?.profileUrl && (
+              <p className="mt-1 text-xs text-red-600">{state.fieldErrors.profileUrl[0]}</p>
+            )}
+          </div>
         )}
       </div>
 

@@ -185,6 +185,12 @@ const InquirySchema = z.object({
   email: z.string().trim().min(1, "Your email is required.").email("Enter a valid email."),
   phone: z.string().trim().optional(),
   message: z.string().trim().min(1, "Add a short message.").max(2000),
+  sendProfile: z.string().optional(),
+  profileUrl: z
+    .string()
+    .trim()
+    .optional()
+    .refine((val) => !val || /^https?:\/\//i.test(val), "Enter a full link, starting with http(s)://"),
 });
 
 export async function submitInquiry(
@@ -202,8 +208,9 @@ export async function submitInquiry(
     return { fieldErrors: parsed.error.flatten().fieldErrors };
   }
 
-  const { name, email, phone, message } = parsed.data;
-  const summary = `Website inquiry from ${name} (${email}${phone ? `, ${phone}` : ""}): ${message}`;
+  const { name, email, phone, message, sendProfile, profileUrl } = parsed.data;
+  const profileNote = sendProfile === "on" && profileUrl ? ` | Also sharing their profile for review: ${profileUrl}` : "";
+  const summary = `Website inquiry from ${name} (${email}${phone ? `, ${phone}` : ""}): ${message}${profileNote}`;
 
   await db.insert(contactLogs).values({
     playerId: target.playerId,
