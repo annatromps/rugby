@@ -43,14 +43,20 @@ export default async function AdminMessagesPage() {
                 <p className="mt-1 whitespace-pre-line text-sm text-slate-600">{m.message}</p>
                 <p className="mt-1 text-xs text-slate-400">{m.createdAt.toLocaleString()}</p>
               </div>
-              <div className="flex shrink-0 items-center gap-3 text-sm">
+              <div className="flex shrink-0 items-center gap-2">
                 <form action={markContactMessageRead.bind(null, m.id, !m.isRead)}>
-                  <button type="submit" className="text-slate-500 hover:text-brand-navy">
+                  <button
+                    type="submit"
+                    className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                  >
                     {m.isRead ? "Mark unread" : "Mark read"}
                   </button>
                 </form>
                 <form action={deleteContactMessage.bind(null, m.id)}>
-                  <button type="submit" className="text-red-500 hover:text-red-700">
+                  <button
+                    type="submit"
+                    className="rounded-md border border-red-200 bg-white px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+                  >
                     Delete
                   </button>
                 </form>

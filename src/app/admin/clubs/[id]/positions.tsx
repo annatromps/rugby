@@ -26,7 +26,10 @@ export function PositionsList({ clubId, needs }: { clubId: string; needs: Positi
               )}
             </div>
             <form action={toggle}>
-              <button type="submit" className="text-xs text-slate-500 hover:underline">
+              <button
+                type="submit"
+                className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+              >
                 {need.filled ? "Mark open" : "Mark filled"}
               </button>
             </form>

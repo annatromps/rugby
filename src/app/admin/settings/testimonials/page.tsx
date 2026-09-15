@@ -51,17 +51,26 @@ export default async function AdminTestimonialsPage() {
               </div>
               <p className="mt-0.5 line-clamp-2 text-sm text-slate-500">&ldquo;{t.quote}&rdquo;</p>
             </div>
-            <div className="flex shrink-0 items-center gap-3 pt-0.5 text-sm">
+            <div className="flex shrink-0 items-center gap-2 pt-0.5">
               <form action={toggleTestimonialActive.bind(null, t.id, !t.isActive)}>
-                <button type="submit" className="text-slate-500 hover:text-brand-navy">
+                <button
+                  type="submit"
+                  className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                >
                   {t.isActive ? "Hide" : "Show"}
                 </button>
               </form>
-              <Link href={`/admin/settings/testimonials/${t.id}`} className="text-slate-500 hover:text-brand-navy">
+              <Link
+                href={`/admin/settings/testimonials/${t.id}`}
+                className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+              >
                 Edit
               </Link>
               <form action={deleteTestimonial.bind(null, t.id)}>
-                <button type="submit" className="text-red-500 hover:text-red-700">
+                <button
+                  type="submit"
+                  className="rounded-md border border-red-200 bg-white px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+                >
                   Delete
                 </button>
               </form>

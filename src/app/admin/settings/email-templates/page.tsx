@@ -21,7 +21,7 @@ export default async function EmailTemplatesPage({
     .orderBy(emailTemplates.name);
 
   return (
-    <div className="max-w-3xl space-y-4">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold text-slate-900">Email templates</h1>
@@ -58,50 +58,80 @@ export default async function EmailTemplatesPage({
         </Link>
       </div>
 
-      <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white shadow-sm">
-        {templates.length === 0 && (
-          <p className="px-4 py-8 text-center text-sm text-slate-400">
-            No {targetType.toLowerCase()} templates yet.{" "}
-            <Link href={`/admin/settings/email-templates/new?type=${targetType}`} className="text-slate-700 underline">
-              Create one
-            </Link>
-            .
-          </p>
-        )}
-        {templates.map((tpl) => (
-          <div key={tpl.id} className="flex items-start justify-between gap-4 px-4 py-3">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <Link href={`/admin/settings/email-templates/${tpl.id}`} className="font-medium text-slate-900 hover:underline">
-                  {tpl.name}
-                </Link>
-                {tpl.isDefault && (
-                  <span className="rounded-full bg-brand-navy/10 px-2 py-0.5 text-[11px] font-medium text-brand-navy">
-                    Default
-                  </span>
-                )}
-              </div>
-              <p className="mt-0.5 truncate text-sm text-slate-500">{tpl.subject}</p>
-            </div>
-            <div className="flex shrink-0 items-center gap-3 pt-0.5 text-sm">
-              {!tpl.isDefault && (
-                <form action={setDefaultEmailTemplate.bind(null, tpl.id, targetType)}>
-                  <button type="submit" className="text-slate-500 hover:text-brand-navy">
-                    Make default
-                  </button>
-                </form>
-              )}
-              <Link href={`/admin/settings/email-templates/${tpl.id}`} className="text-slate-500 hover:text-brand-navy">
-                Edit
-              </Link>
-              <form action={deleteEmailTemplate.bind(null, tpl.id, targetType)}>
-                <button type="submit" className="text-red-500 hover:text-red-700">
-                  Delete
-                </button>
-              </form>
-            </div>
-          </div>
-        ))}
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-slate-100 text-left text-xs uppercase tracking-wide text-slate-400">
+              <th className="px-4 py-3 font-medium">Template</th>
+              <th className="px-4 py-3 font-medium">Subject</th>
+              <th className="px-4 py-3 font-medium">Default</th>
+              <th className="px-4 py-3 font-medium text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {templates.length === 0 && (
+              <tr>
+                <td colSpan={4} className="px-4 py-10 text-center text-sm text-slate-400">
+                  No {targetType.toLowerCase()} templates yet.{" "}
+                  <Link
+                    href={`/admin/settings/email-templates/new?type=${targetType}`}
+                    className="text-slate-700 underline"
+                  >
+                    Create one
+                  </Link>
+                  .
+                </td>
+              </tr>
+            )}
+            {templates.map((tpl) => (
+              <tr key={tpl.id} className="hover:bg-slate-50">
+                <td className="px-4 py-3">
+                  <Link
+                    href={`/admin/settings/email-templates/${tpl.id}`}
+                    className="font-medium text-slate-900 hover:underline"
+                  >
+                    {tpl.name}
+                  </Link>
+                </td>
+                <td className="max-w-xs truncate px-4 py-3 text-slate-500">{tpl.subject}</td>
+                <td className="px-4 py-3">
+                  {tpl.isDefault ? (
+                    <span className="rounded-full bg-brand-navy/10 px-2 py-0.5 text-[11px] font-medium text-brand-navy">
+                      Default
+                    </span>
+                  ) : (
+                    <form action={setDefaultEmailTemplate.bind(null, tpl.id, targetType)}>
+                      <button
+                        type="submit"
+                        className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                      >
+                        Make default
+                      </button>
+                    </form>
+                  )}
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center justify-end gap-2">
+                    <Link
+                      href={`/admin/settings/email-templates/${tpl.id}`}
+                      className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                    >
+                      Edit
+                    </Link>
+                    <form action={deleteEmailTemplate.bind(null, tpl.id, targetType)}>
+                      <button
+                        type="submit"
+                        className="rounded-md border border-red-200 bg-white px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+                      >
+                        Delete
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
