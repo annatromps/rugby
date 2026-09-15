@@ -18,7 +18,7 @@ export default async function AdminPricingPage() {
             <Link href="/pricing" target="_blank" className="underline">
               /pricing
             </Link>{" "}
-            page. These are placeholder figures until real pricing is decided -- edit them any time.
+            page. These are placeholder figures until real pricing is decided, edit them any time.
           </p>
         </div>
         <Link
@@ -60,7 +60,7 @@ export default async function AdminPricingPage() {
               <p className="mt-0.5 text-sm text-slate-500">
                 {plan.priceLabel}
                 {plan.billingPeriod ? ` / ${plan.billingPeriod}` : ""}
-                {plan.tagline ? ` -- ${plan.tagline}` : ""}
+                {plan.tagline ? ` - ${plan.tagline}` : ""}
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-2 pt-0.5">

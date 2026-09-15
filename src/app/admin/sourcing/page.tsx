@@ -27,7 +27,7 @@ export default async function SourcingPage() {
         <h1 className="text-xl font-semibold text-slate-900">AI-assisted sourcing</h1>
         <p className="mt-1 text-sm text-slate-500">
           Describe the kind of club or player you&apos;re trying to find. Claude searches the web and proposes
-          candidates for you to review -- you decide what gets added.
+          candidates for you to review, you decide what gets added.
         </p>
       </div>
 

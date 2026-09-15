@@ -42,7 +42,7 @@ export async function signUpAccount(
 
   const [existing] = await db.select({ id: accounts.id }).from(accounts).where(eq(accounts.email, email)).limit(1);
   if (existing) {
-    return { error: "An account with that email already exists -- try logging in instead." };
+    return { error: "An account with that email already exists. Try logging in instead." };
   }
 
   const passwordHash = await bcrypt.hash(password, 10);

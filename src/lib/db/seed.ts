@@ -106,7 +106,7 @@ async function main() {
     {
       searchId: search.id,
       targetType: "PLAYER",
-      name: "Demo candidate -- run a real AI search to replace this",
+      name: "Demo candidate, run a real AI search to replace this",
       summary:
         "This is a placeholder row so you can see what a sourcing result looks like. Set ANTHROPIC_API_KEY and run a real search from the AI Sourcing page.",
       reviewStatus: "PENDING",

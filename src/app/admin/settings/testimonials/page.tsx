@@ -14,7 +14,7 @@ export default async function AdminTestimonialsPage() {
         <div>
           <h1 className="text-xl font-semibold text-slate-900">Testimonials</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Shown on the homepage. Currently placeholder (Latin) text -- swap each one for a real quote as they come in.
+            Shown on the homepage. Currently placeholder (Latin) text, swap each one for a real quote as they come in.
           </p>
         </div>
         <Link

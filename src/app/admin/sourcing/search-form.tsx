@@ -39,7 +39,7 @@ export function SearchForm() {
       </div>
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
       <p className="text-xs text-slate-400">
-        Claude searches the web and proposes real candidates for you to review below -- nothing is added to your
+        Claude searches the web and proposes real candidates for you to review below. Nothing is added to your
         Clubs or Players list until you accept a suggestion.
       </p>
     </form>

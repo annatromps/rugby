@@ -19,7 +19,7 @@ export default function NewCoachPage() {
           <Field label="Nationality" name="nationality" />
           <Field label="Currently based in" name="currentCountry" />
           <Field
-            label="Specialization"
+            label="Specialisation"
             name="specialization"
             required
             placeholder="e.g. Forwards / scrum"

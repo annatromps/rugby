@@ -33,7 +33,7 @@ export async function generateMetadata({
   const coach = await getPublicCoach(id);
   if (!coach) return { title: "Coach not found" };
 
-  const title = `${fuzzName(coach.firstName, coach.lastName)} -- ${coach.specialization}`;
+  const title = `${fuzzName(coach.firstName, coach.lastName)} - ${coach.specialization}`;
   const description =
     [coach.currentCountry ? `Based in ${coach.currentCountry}` : null, coach.coachingLevel].filter(Boolean).join(" · ") ||
     "View this coach's profile on Kickoff Rugby Recruitment.";

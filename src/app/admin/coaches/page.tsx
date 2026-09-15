@@ -101,7 +101,7 @@ export default async function CoachesPage({
           <thead>
             <tr className="border-b border-slate-100 text-left text-xs uppercase tracking-wide text-slate-400">
               <th className="px-4 py-3 font-medium">Coach</th>
-              <th className="px-4 py-3 font-medium">Specialization</th>
+              <th className="px-4 py-3 font-medium">Specialisation</th>
               <th className="px-4 py-3 font-medium">Based in</th>
               <th className="px-4 py-3 font-medium">Published</th>
               <th className="px-4 py-3 font-medium">Status</th>

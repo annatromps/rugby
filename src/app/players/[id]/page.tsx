@@ -34,7 +34,7 @@ export async function generateMetadata({
   const player = await getPublicPlayer(id);
   if (!player) return { title: "Player not found" };
 
-  const title = `${fuzzName(player.firstName, player.lastName)} -- ${player.position}`;
+  const title = `${fuzzName(player.firstName, player.lastName)} - ${player.position}`;
   const description = [player.currentCountry ? `Based in ${player.currentCountry}` : null, player.level]
     .filter(Boolean)
     .join(" · ") || "View this player's profile on Kickoff Rugby Recruitment.";

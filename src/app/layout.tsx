@@ -12,7 +12,7 @@ import "./globals.css";
 
 const SITE_URL = "https://rugby-snowy.vercel.app"; // update once a custom domain is live
 const SITE_DESCRIPTION =
-  "Where rugby players and clubs find each other -- browse players, browse clubs, and connect directly.";
+  "Where rugby players and clubs find each other. Browse players, browse clubs, and connect directly.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

@@ -24,19 +24,19 @@ export default async function PricingPage() {
     <div className="flex min-h-full flex-col">
       <SiteHeader />
       <main className="flex-1 bg-slate-50">
-        <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6">
+        <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
             <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">Simple, straightforward pricing</h1>
             <p className="mt-3 text-base text-slate-600">
-              We&rsquo;re a new marketplace and still finalizing pricing -- the figures below are indicative.
+              We&rsquo;re a new marketplace and still finalising pricing, so the figures below are indicative.
               Reach out if you have questions about what&rsquo;s right for your club.
             </p>
           </div>
 
           {plans.length === 0 ? (
-            <p className="mt-12 text-center text-sm text-slate-400">Pricing details are coming soon.</p>
+            <p className="mt-8 text-center text-sm text-slate-400">Pricing details are coming soon.</p>
           ) : (
-            <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {plans.map((plan) => {
                 const features = Array.isArray(plan.features) ? (plan.features as string[]) : [];
                 return (

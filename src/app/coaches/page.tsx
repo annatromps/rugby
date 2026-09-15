@@ -12,7 +12,7 @@ const PUBLIC_EXCLUDED_STATUSES: Array<"ARCHIVED" | "PLACED"> = ["ARCHIVED", "PLA
 
 export const metadata: Metadata = {
   title: "Find coaches",
-  description: "Browse rugby coaches looking for a club, filterable by specialization and country.",
+  description: "Browse rugby coaches looking for a club, filterable by specialisation and country.",
 };
 
 export default async function CoachesPage({
@@ -48,7 +48,7 @@ export default async function CoachesPage({
 
         <form className="mb-6 flex flex-wrap gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="flex-1 min-w-[160px]">
-            <label className="block text-xs font-medium text-slate-500">Specialization</label>
+            <label className="block text-xs font-medium text-slate-500">Specialisation</label>
             <input
               name="q"
               defaultValue={q}

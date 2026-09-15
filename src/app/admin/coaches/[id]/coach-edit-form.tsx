@@ -17,7 +17,7 @@ export function CoachEditForm({ coach }: { coach: Coach }) {
       <Field label="Phone" name="phone" defaultValue={coach.phone ?? ""} />
       <Field label="Nationality" name="nationality" defaultValue={coach.nationality ?? ""} />
       <Field label="Currently based in" name="currentCountry" defaultValue={coach.currentCountry ?? ""} />
-      <Field label="Specialization" name="specialization" defaultValue={coach.specialization} required />
+      <Field label="Specialisation" name="specialization" defaultValue={coach.specialization} required />
       <Field label="Coaching level" name="coachingLevel" defaultValue={coach.coachingLevel ?? ""} />
       <Field label="Current club" name="currentClub" defaultValue={coach.currentClub ?? ""} />
       <Field

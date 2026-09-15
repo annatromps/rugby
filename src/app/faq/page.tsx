@@ -12,7 +12,7 @@ const FAQS = [
   {
     question: "Is Kickoff Rugby Recruitment free to use?",
     answer:
-      "Browsing the directory and messaging is free for players and coaches. We're a new marketplace and still finalizing pricing for clubs -- see the Pricing page for the current (indicative) plans.",
+      "Browsing the directory and messaging is free for players and coaches. We're a new marketplace and still finalising pricing for clubs, so see the Pricing page for the current (indicative) plans.",
   },
   {
     question: "How do I create a profile?",
@@ -27,7 +27,7 @@ const FAQS = [
   {
     question: "What does the \"Verified\" badge mean?",
     answer:
-      "It's a manual check by our team confirming a listing is a real person or club with working contact details. It's meant to build trust in a brand-new marketplace -- an unverified listing isn't necessarily untrustworthy, just not yet checked.",
+      "It's a manual check by our team confirming a listing is a real person or club with working contact details. It's meant to build trust in a brand-new marketplace: an unverified listing isn't necessarily untrustworthy, just not yet checked.",
   },
   {
     question: "How do clubs, players, and coaches get in touch with each other?",
@@ -37,20 +37,20 @@ const FAQS = [
   {
     question: "Is my contact information visible to everyone?",
     answer:
-      "No. Your public profile shows what you choose to list (position, level, location, and so on), but your email and phone number are only used for us and interested parties to reach you -- they aren't displayed on the page.",
+      "No. Your public profile shows what you choose to list (position, level, location, and so on), but your email and phone number are only used for us and interested parties to reach you. They aren't displayed on the page.",
   },
   {
     question: "Can I update or remove my listing?",
     answer:
-      "Yes -- contact us and we'll update or take down your listing. Self-serve account editing is on our roadmap.",
+      "Yes, contact us and we'll update or take down your listing. Self-serve account editing is on our roadmap.",
   },
   {
     question: "Do you help with relocation?",
     answer:
-      "Once a conversation between a player/coach and a club is underway, our team can help with the practical side -- references, relocation support, and anything else that comes up moving from a first message to a signed deal.",
+      "Once a conversation between a player/coach and a club is underway, our team can help with the practical side: references, relocation support, and anything else that comes up moving from a first message to a signed deal.",
   },
   {
-    question: "I have another question -- who do I ask?",
+    question: "I have another question, who do I ask?",
     answer: "Reach out any time through our contact page and we'll get back to you.",
   },
 ];
@@ -61,7 +61,7 @@ export default function FaqPage() {
       <SiteHeader />
       <main className="flex-1">
         <section className="bg-brand-navy">
-          <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6">
+          <div className="mx-auto max-w-3xl px-4 py-10 text-center sm:px-6">
             <h1 className="text-3xl font-bold text-white sm:text-4xl">Frequently asked questions</h1>
             <p className="mt-3 text-base text-slate-200">
               Everything you need to know about using Kickoff Rugby Recruitment.
@@ -69,7 +69,7 @@ export default function FaqPage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+        <section className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
           <dl className="space-y-8">
             {FAQS.map((item) => (
               <div key={item.question} className="border-l-2 border-brand-coral pl-5">
@@ -79,7 +79,7 @@ export default function FaqPage() {
             ))}
           </dl>
 
-          <div className="mt-14 flex flex-col items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-8 text-center">
+          <div className="mt-10 flex flex-col items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-8 text-center">
             <h2 className="text-lg font-semibold text-slate-900">Still have questions?</h2>
             <Link
               href="/contact"

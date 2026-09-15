@@ -71,7 +71,7 @@ export function CoachApplicationForm() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className={labelClass}>Specialization</label>
+          <label className={labelClass}>Specialisation</label>
           <input name="specialization" required placeholder="e.g. Forwards / scrum" className={inputClass} />
           {fieldErrors?.specialization && <p className="mt-1 text-xs text-red-600">{fieldErrors.specialization[0]}</p>}
         </div>
