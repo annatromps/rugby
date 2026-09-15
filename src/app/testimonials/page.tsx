@@ -26,14 +26,13 @@ export default async function TestimonialsPage() {
         <div className="mb-10 text-center">
           <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">What people are saying</h1>
           <p className="mt-2 text-sm text-slate-600">
-            We're a new marketplace, so these are still placeholders -- real quotes will replace them as
-            players, coaches, and clubs use the site.
+            {rows.length === 0
+              ? "We're a new marketplace, so there's nothing here yet -- real quotes will appear as players, coaches, and clubs use the site."
+              : "What players, coaches, and clubs say about Kickoff Rugby Recruitment."}
           </p>
         </div>
 
-        {rows.length === 0 ? (
-          <p className="text-center text-sm text-slate-500">No testimonials to show yet.</p>
-        ) : (
+        {rows.length === 0 ? null : (
           <div className="grid gap-6 sm:grid-cols-3">
             {rows.map((t) => (
               <figure key={t.id} className="rounded-xl border border-slate-200 bg-slate-50 p-6">

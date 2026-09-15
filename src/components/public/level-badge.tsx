@@ -14,7 +14,9 @@ export function LevelBadge({ level }: { level: string | null }) {
   if (!level) return null;
   const styles = LEVEL_STYLES[level] ?? "bg-brand-navy/10 text-brand-navy";
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${styles}`}>
+    <span
+      className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ${styles}`}
+    >
       {PLAYER_LEVEL_LABELS[level] ?? level}
     </span>
   );

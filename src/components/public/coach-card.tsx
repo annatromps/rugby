@@ -13,7 +13,7 @@ export function CoachCard({ coach, loggedIn }: { coach: Coach; loggedIn: boolean
       href={`/coaches/${coach.id}`}
       className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-brand-navy/40 hover:shadow-md"
     >
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex flex-wrap items-start justify-between gap-x-2 gap-y-1">
         <div className="flex items-center gap-3">
           <Avatar
             src={loggedIn ? coach.photoUrl : null}
@@ -27,7 +27,7 @@ export function CoachCard({ coach, loggedIn }: { coach: Coach; loggedIn: boolean
           </h3>
         </div>
         {coach.coachingLevel && (
-          <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+          <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
             {coach.coachingLevel}
           </span>
         )}

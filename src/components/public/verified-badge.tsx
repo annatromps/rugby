@@ -2,7 +2,7 @@ export function VerifiedBadge() {
   return (
     <span
       title="Checked by the Kickoff Rugby team"
-      className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700"
+      className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700"
     >
       <svg viewBox="0 0 20 20" fill="currentColor" className="h-3 w-3">
         <path
