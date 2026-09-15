@@ -367,6 +367,18 @@ export const testimonials = pgTable("testimonials", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// General "contact us" messages from the public site (not tied to any
+// specific club/player/coach listing -- those go through contactLogs via
+// submitInquiry instead). Reviewed from /admin/messages.
+export const contactMessages = pgTable("contact_messages", {
+  id: id(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  message: text("message").notNull(),
+  isRead: boolean("is_read").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // ---------- Portal accounts & messaging ----------
 
 // A club, player, or coach's own self-serve login is just that record's

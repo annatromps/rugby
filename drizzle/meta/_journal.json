@@ -50,6 +50,13 @@
       "when": 1789469471516,
       "tag": "0006_nice_black_bolt",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789476296477,
+      "tag": "0007_swift_human_torch",
+      "breakpoints": true
     }
   ]
 }

@@ -138,6 +138,11 @@ export default async function HomePage() {
                   </figure>
                 ))}
               </div>
+              <p className="mt-6 text-center text-sm">
+                <Link href="/testimonials" className="font-medium text-brand-navy hover:underline">
+                  See all testimonials &rarr;
+                </Link>
+              </p>
             </div>
           </section>
         )}

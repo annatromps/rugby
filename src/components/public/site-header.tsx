@@ -8,6 +8,8 @@ const NAV_LINKS = [
   { href: "/positions", label: "Open positions" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/pricing", label: "Pricing" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export function SiteHeader() {

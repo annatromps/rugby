@@ -21,6 +21,15 @@ export function SiteFooter() {
           <Link href="/pricing" className="hover:text-brand-navy">
             Pricing
           </Link>
+          <Link href="/testimonials" className="hover:text-brand-navy">
+            Testimonials
+          </Link>
+          <Link href="/faq" className="hover:text-brand-navy">
+            FAQ
+          </Link>
+          <Link href="/contact" className="hover:text-brand-navy">
+            Contact
+          </Link>
           <Link href="/join/player" className="hover:text-brand-navy">
             Join as a player
           </Link>

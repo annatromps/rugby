@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: "/admin/settings/email-templates", label: "Email Templates" },
   { href: "/admin/settings/pricing", label: "Pricing" },
   { href: "/admin/settings/testimonials", label: "Testimonials" },
+  { href: "/admin/messages", label: "Messages" },
 ];
 
 export function AdminNav({ className = "" }: { className?: string }) {
