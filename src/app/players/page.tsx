@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/public/site-header";
 import { SiteFooter } from "@/components/public/site-footer";
 import { PlayerCard } from "@/components/public/player-card";
 import { getPortalAccount } from "@/lib/auth/portal-dal";
+import { getAdminSession } from "@/lib/auth/dal";
 import { PLAYER_LEVELS, PLAYER_LEVEL_LABELS } from "@/lib/constants";
 
 const PUBLIC_EXCLUDED_STATUSES: Array<"ARCHIVED" | "PLACED"> = ["ARCHIVED", "PLACED"];
@@ -22,7 +23,12 @@ export default async function PlayersPage({
   searchParams: Promise<{ q?: string; country?: string; level?: string }>;
 }) {
   const { q, country, level } = await searchParams;
-  const account = await getPortalAccount();
+  // A signed-in visitor account OR a staff member browsing the public
+  // site both count as "logged in" for the purposes of revealing a real
+  // player's name/photo -- staff can already see everything in /admin,
+  // so there's no reason to anonymize it for them here too.
+  const [account, admin] = await Promise.all([getPortalAccount(), getAdminSession()]);
+  const loggedIn = !!account || !!admin;
 
   const conditions = [
     eq(players.isPublished, true),
@@ -107,7 +113,7 @@ export default async function PlayersPage({
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {rows.map((player) => (
-              <PlayerCard key={player.id} player={player} loggedIn={!!account} />
+              <PlayerCard key={player.id} player={player} loggedIn={loggedIn} />
             ))}
           </div>
         )}

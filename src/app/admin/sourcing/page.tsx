@@ -4,6 +4,15 @@ import { sourcingSearches, sourcingSuggestions } from "@/lib/db/schema";
 import { SearchForm } from "./search-form";
 import { SuggestionCard } from "./suggestion-card";
 
+// The AI sourcing search (see runSearch in actions/sourcing.ts) can take a
+// while -- Claude may run several web-search round-trips before it has
+// enough to answer -- which was regularly outliving Vercel's ~10s default
+// function duration and killing the request mid-search (the admin just
+// saw "Searching..." hang forever). This raises the budget for Server
+// Actions invoked from this route; 60s is the max this project's (Hobby)
+// plan allows -- raise it if the plan changes and searches still time out.
+export const maxDuration = 60;
+
 export default async function SourcingPage() {
   const searches = await db
     .select()

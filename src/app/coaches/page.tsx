@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/public/site-header";
 import { SiteFooter } from "@/components/public/site-footer";
 import { CoachCard } from "@/components/public/coach-card";
 import { getPortalAccount } from "@/lib/auth/portal-dal";
+import { getAdminSession } from "@/lib/auth/dal";
 
 const PUBLIC_EXCLUDED_STATUSES: Array<"ARCHIVED" | "PLACED"> = ["ARCHIVED", "PLACED"];
 
@@ -21,7 +22,10 @@ export default async function CoachesPage({
   searchParams: Promise<{ q?: string; country?: string }>;
 }) {
   const { q, country } = await searchParams;
-  const account = await getPortalAccount();
+  // See the matching comment in players/page.tsx -- staff browsing the
+  // public site count as "logged in" here too.
+  const [account, admin] = await Promise.all([getPortalAccount(), getAdminSession()]);
+  const loggedIn = !!account || !!admin;
 
   const conditions = [
     eq(coaches.isPublished, true),
@@ -86,7 +90,7 @@ export default async function CoachesPage({
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {rows.map((coach) => (
-              <CoachCard key={coach.id} coach={coach} loggedIn={!!account} />
+              <CoachCard key={coach.id} coach={coach} loggedIn={loggedIn} />
             ))}
           </div>
         )}

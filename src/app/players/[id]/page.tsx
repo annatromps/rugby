@@ -13,6 +13,7 @@ import { InquiryForm } from "@/components/public/inquiry-form";
 import { SignUpGate } from "@/components/public/sign-up-gate";
 import { submitInquiry } from "@/app/actions/public";
 import { getPortalAccount } from "@/lib/auth/portal-dal";
+import { getAdminSession } from "@/lib/auth/dal";
 import { isDemoName } from "@/lib/is-demo";
 
 const PUBLIC_EXCLUDED_STATUSES = new Set(["ARCHIVED", "PLACED"]);
@@ -49,12 +50,20 @@ export default async function PlayerProfilePage({
 }) {
   const { id } = await params;
 
-  const [player, account] = await Promise.all([getPublicPlayer(id), getPortalAccount()]);
+  const [player, account, admin] = await Promise.all([
+    getPublicPlayer(id),
+    getPortalAccount(),
+    getAdminSession(),
+  ]);
   if (!player) notFound();
 
+  // A signed-in visitor account OR a staff member both count as "signed
+  // in" for revealing this player's real name/photo -- see the matching
+  // comment on players/page.tsx.
+  const loggedIn = !!account || !!admin;
   const inquiryAction = submitInquiry.bind(null, { playerId: player.id });
   const isDemo = isDemoName(player.lastName);
-  const canReveal = !!account || isDemo;
+  const canReveal = loggedIn || isDemo;
   const fullName = `${player.firstName} ${player.lastName}`;
 
   return (
@@ -70,14 +79,14 @@ export default async function PlayerProfilePage({
             <div className="flex flex-wrap items-center gap-4">
               <Avatar
                 src={canReveal ? player.photoUrl : null}
-                alt={account ? fullName : "Rugby player"}
+                alt={loggedIn ? fullName : "Rugby player"}
                 initials={`${player.firstName[0] ?? ""}${player.lastName[0] ?? ""}`}
-                anonymous={!account}
+                anonymous={!loggedIn}
                 size={72}
               />
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className={account ? "text-2xl font-bold text-slate-900" : "text-2xl font-medium italic text-slate-400"}>
-                  {account ? fullName : "Sign in to see name"}
+                <h1 className={loggedIn ? "text-2xl font-bold text-slate-900" : "text-2xl font-medium italic text-slate-400"}>
+                  {loggedIn ? fullName : "Sign in to see name"}
                 </h1>
                 <LevelBadge level={player.level} />
                 {player.isVerified && <VerifiedBadge />}
@@ -139,6 +148,10 @@ export default async function PlayerProfilePage({
           <div>
             {account ? (
               <InquiryForm action={inquiryAction} heading="Interested? Send a message" />
+            ) : admin ? (
+              <div className="rounded-xl border border-dashed border-slate-300 p-4 text-sm text-slate-500">
+                Staff can’t send inquiries as a visitor -- log in with a player/club account to message this profile.
+              </div>
             ) : (
               <SignUpGate heading="Interested? Send a message" />
             )}
