@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 160">
+  <path d="M70 6 L130 25 V80 C130 120 106 148 70 158 C34 148 10 120 10 80 V25 Z" fill="#c9752f" stroke="#ffffff" stroke-width="4"/>
+  <path d="M70 6 L130 25 V80 C130 120 106 148 70 158 Z" fill="#17335c"/>
+  <g transform="translate(70 50) rotate(-18)">
+    <ellipse cx="0" cy="0" rx="19" ry="12" fill="#ffffff"/>
+    <path d="M-13 0 H13 M-6 -6 V6 M6 -6 V6" stroke="#c9752f" stroke-width="1.6" fill="none"/>
+  </g>
+  <text x="70" y="122" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="36" fill="#ffffff">CB</text>
+</svg>

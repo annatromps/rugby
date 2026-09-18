@@ -56,8 +56,12 @@ export default async function HomePage() {
       <SiteHeader />
 
       <main className="flex-1">
-        <section className="bg-brand-navy">
-          <div className="mx-auto max-w-6xl px-4 py-16 text-center sm:px-6 sm:py-24">
+        <section
+          className="relative bg-brand-navy bg-cover bg-center"
+          style={{ backgroundImage: "url(/hero-pattern.svg)" }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/40 to-brand-navy" aria-hidden="true" />
+          <div className="relative mx-auto max-w-6xl px-4 py-16 text-center sm:px-6 sm:py-24">
             <h1 className="text-3xl font-bold tracking-tight text-white sm:text-5xl">
               Where rugby players, coaches, and clubs find each other
             </h1>
@@ -94,31 +98,33 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-          <div className="grid gap-8 sm:grid-cols-3">
-            <div>
-              <div className="text-2xl font-bold text-brand-coral">1</div>
-              <h3 className="mt-1 font-semibold text-slate-900">Create a profile</h3>
-              <p className="mt-1 text-sm text-slate-600">
-                Players and coaches list their position or specialization, level and
-                experience. Clubs list their league, level and open positions.
-              </p>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-brand-coral">2</div>
-              <h3 className="mt-1 font-semibold text-slate-900">Get discovered</h3>
-              <p className="mt-1 text-sm text-slate-600">
-                Anyone can browse and search the directory — no account
-                needed to look around.
-              </p>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-brand-coral">3</div>
-              <h3 className="mt-1 font-semibold text-slate-900">Get in touch</h3>
-              <p className="mt-1 text-sm text-slate-600">
-                Send a message directly from a profile page. Our team helps
-                move things along from there, including relocation support.
-              </p>
+        <section className="bg-brand-navy-dark">
+          <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+            <div className="grid gap-8 sm:grid-cols-3">
+              <div>
+                <div className="text-2xl font-bold text-brand-coral">1</div>
+                <h3 className="mt-1 font-semibold text-white">Create a profile</h3>
+                <p className="mt-1 text-sm text-slate-300">
+                  Players and coaches list their position or specialization, level and
+                  experience. Clubs list their league, level and open positions.
+                </p>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-brand-coral">2</div>
+                <h3 className="mt-1 font-semibold text-white">Get discovered</h3>
+                <p className="mt-1 text-sm text-slate-300">
+                  Anyone can browse and search the directory — no account
+                  needed to look around.
+                </p>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-brand-coral">3</div>
+                <h3 className="mt-1 font-semibold text-white">Get in touch</h3>
+                <p className="mt-1 text-sm text-slate-300">
+                  Send a message directly from a profile page. Our team helps
+                  move things along from there, including relocation support.
+                </p>
+              </div>
             </div>
           </div>
         </section>

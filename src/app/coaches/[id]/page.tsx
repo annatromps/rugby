@@ -12,7 +12,7 @@ import { InquiryForm } from "@/components/public/inquiry-form";
 import { SignUpGate } from "@/components/public/sign-up-gate";
 import { submitInquiry } from "@/app/actions/public";
 import { getPortalAccount } from "@/lib/auth/portal-dal";
-import { fuzzName } from "@/lib/fuzz-name";
+import { isDemoName } from "@/lib/is-demo";
 
 const PUBLIC_EXCLUDED_STATUSES = new Set(["ARCHIVED", "PLACED"]);
 
@@ -33,7 +33,7 @@ export async function generateMetadata({
   const coach = await getPublicCoach(id);
   if (!coach) return { title: "Coach not found" };
 
-  const title = `${fuzzName(coach.firstName, coach.lastName)} - ${coach.specialization}`;
+  const title = `${coach.specialization} coach profile - Kickoff Rugby Recruitment`;
   const description =
     [coach.currentCountry ? `Based in ${coach.currentCountry}` : null, coach.coachingLevel].filter(Boolean).join(" · ") ||
     "View this coach's profile on Kickoff Rugby Recruitment.";
@@ -52,7 +52,9 @@ export default async function CoachProfilePage({
   if (!coach) notFound();
 
   const inquiryAction = submitInquiry.bind(null, { coachId: coach.id });
-  const displayName = account ? `${coach.firstName} ${coach.lastName}` : fuzzName(coach.firstName, coach.lastName);
+  const isDemo = isDemoName(coach.lastName);
+  const canReveal = !!account || isDemo;
+  const fullName = `${coach.firstName} ${coach.lastName}`;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -66,13 +68,16 @@ export default async function CoachProfilePage({
           <div className="sm:col-span-2">
             <div className="flex flex-wrap items-center gap-4">
               <Avatar
-                src={account ? coach.photoUrl : null}
-                alt={displayName}
+                src={canReveal ? coach.photoUrl : null}
+                alt={account ? fullName : "Rugby coach"}
                 initials={`${coach.firstName[0] ?? ""}${coach.lastName[0] ?? ""}`}
+                anonymous={!account}
                 size={72}
               />
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-2xl font-bold text-slate-900">{displayName}</h1>
+                <h1 className={account ? "text-2xl font-bold text-slate-900" : "text-2xl font-medium italic text-slate-400"}>
+                  {account ? fullName : "Sign in to see name"}
+                </h1>
                 {coach.isVerified && <VerifiedBadge />}
               </div>
             </div>

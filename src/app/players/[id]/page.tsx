@@ -13,7 +13,7 @@ import { InquiryForm } from "@/components/public/inquiry-form";
 import { SignUpGate } from "@/components/public/sign-up-gate";
 import { submitInquiry } from "@/app/actions/public";
 import { getPortalAccount } from "@/lib/auth/portal-dal";
-import { fuzzName } from "@/lib/fuzz-name";
+import { isDemoName } from "@/lib/is-demo";
 
 const PUBLIC_EXCLUDED_STATUSES = new Set(["ARCHIVED", "PLACED"]);
 
@@ -34,7 +34,7 @@ export async function generateMetadata({
   const player = await getPublicPlayer(id);
   if (!player) return { title: "Player not found" };
 
-  const title = `${fuzzName(player.firstName, player.lastName)} - ${player.position}`;
+  const title = `${player.position} player profile - Kickoff Rugby Recruitment`;
   const description = [player.currentCountry ? `Based in ${player.currentCountry}` : null, player.level]
     .filter(Boolean)
     .join(" · ") || "View this player's profile on Kickoff Rugby Recruitment.";
@@ -53,9 +53,9 @@ export default async function PlayerProfilePage({
   if (!player) notFound();
 
   const inquiryAction = submitInquiry.bind(null, { playerId: player.id });
-  const displayName = account
-    ? `${player.firstName} ${player.lastName}`
-    : fuzzName(player.firstName, player.lastName);
+  const isDemo = isDemoName(player.lastName);
+  const canReveal = !!account || isDemo;
+  const fullName = `${player.firstName} ${player.lastName}`;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -69,13 +69,16 @@ export default async function PlayerProfilePage({
           <div className="sm:col-span-2">
             <div className="flex flex-wrap items-center gap-4">
               <Avatar
-                src={account ? player.photoUrl : null}
-                alt={displayName}
+                src={canReveal ? player.photoUrl : null}
+                alt={account ? fullName : "Rugby player"}
                 initials={`${player.firstName[0] ?? ""}${player.lastName[0] ?? ""}`}
+                anonymous={!account}
                 size={72}
               />
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-2xl font-bold text-slate-900">{displayName}</h1>
+                <h1 className={account ? "text-2xl font-bold text-slate-900" : "text-2xl font-medium italic text-slate-400"}>
+                  {account ? fullName : "Sign in to see name"}
+                </h1>
                 <LevelBadge level={player.level} />
                 {player.isVerified && <VerifiedBadge />}
               </div>

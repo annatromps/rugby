@@ -1,13 +1,18 @@
 import Link from "next/link";
 import { VerifiedBadge } from "./verified-badge";
 import { Avatar } from "./avatar";
-import { fuzzName } from "@/lib/fuzz-name";
+import { isDemoName } from "@/lib/is-demo";
 import type { coaches } from "@/lib/db/schema";
 
 type Coach = typeof coaches.$inferSelect;
 
 export function CoachCard({ coach, loggedIn }: { coach: Coach; loggedIn: boolean }) {
-  const displayName = loggedIn ? `${coach.firstName} ${coach.lastName}` : fuzzName(coach.firstName, coach.lastName);
+  const isDemo = isDemoName(coach.lastName);
+  // See the matching comment in player-card.tsx: signed-out visitors get
+  // no part of a real coach's name, but a demo row's fake photo is safe
+  // to show right away since there's no real person behind it.
+  const canReveal = loggedIn || isDemo;
+  const fullName = `${coach.firstName} ${coach.lastName}`;
   return (
     <Link
       href={`/coaches/${coach.id}`}
@@ -16,15 +21,23 @@ export function CoachCard({ coach, loggedIn }: { coach: Coach; loggedIn: boolean
       <div className="flex flex-wrap items-start justify-between gap-x-2 gap-y-1">
         <div className="flex items-center gap-3">
           <Avatar
-            src={loggedIn ? coach.photoUrl : null}
-            alt={displayName}
+            src={canReveal ? coach.photoUrl : null}
+            alt={loggedIn ? fullName : "Rugby coach"}
             initials={`${coach.firstName[0] ?? ""}${coach.lastName[0] ?? ""}`}
+            anonymous={!loggedIn}
             size={44}
           />
-          <h3 className="flex items-center gap-2 font-semibold text-slate-900">
-            {displayName}
-            {coach.isVerified && <VerifiedBadge />}
-          </h3>
+          {loggedIn ? (
+            <h3 className="flex items-center gap-2 font-semibold text-slate-900">
+              {fullName}
+              {coach.isVerified && <VerifiedBadge />}
+            </h3>
+          ) : (
+            <h3 className="flex items-center gap-2 text-sm italic text-slate-400">
+              Sign in to see name
+              {coach.isVerified && <VerifiedBadge />}
+            </h3>
+          )}
         </div>
         {coach.coachingLevel && (
           <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
