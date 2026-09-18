@@ -41,3 +41,24 @@ export const requireAdmin = cache(async () => {
   }
   return admin;
 });
+
+// Read-only check for "is a staff member signed in?" -- like
+// getPortalAccount() below, this never redirects, so pages/components that
+// render for anyone (signed in or not) can safely call it. Used by
+// SiteHeader so the public site recognizes an active staff session instead
+// of showing "Log in" to someone who's actually signed in as an admin.
+export const getAdminSession = cache(async () => {
+  const session = await readSessionCookie();
+  if (!session?.adminId) return null;
+  const [admin] = await db
+    .select({
+      id: adminUsers.id,
+      email: adminUsers.email,
+      name: adminUsers.name,
+      role: adminUsers.role,
+    })
+    .from(adminUsers)
+    .where(eq(adminUsers.id, session.adminId))
+    .limit(1);
+  return admin ?? null;
+});

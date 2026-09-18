@@ -265,6 +265,39 @@ export const placements = pgTable("placements", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// ---------- Athlete services (public-facing requests) ----------
+// Leads captured from the public /services page -- separate from
+// accommodationRequests below, which is internal ops tracking once a
+// specific placed player is actively being helped. A service request here
+// is the first "I'd like help with X" contact from anyone (not necessarily
+// an existing player record yet); an admin triages it and, for
+// accommodation asks tied to an actual placement, may create a proper
+// accommodationRequests row to track the search itself.
+
+export const serviceTypeEnum = pgEnum("service_type", [
+  "CV_HELP",
+  "ACCOMMODATION",
+  "VISA_RELOCATION",
+  "OTHER",
+]);
+
+export const serviceRequestStatusEnum = pgEnum("service_request_status", [
+  "NEW",
+  "IN_PROGRESS",
+  "DONE",
+]);
+
+export const serviceRequests = pgTable("service_requests", {
+  id: id(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  serviceType: serviceTypeEnum("service_type").notNull(),
+  message: text("message"),
+  status: serviceRequestStatusEnum("status").notNull().default("NEW"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // ---------- Support services (accommodation) ----------
 
 export const accommodationStatusEnum = pgEnum("accommodation_status", [

@@ -26,7 +26,9 @@ export function ContactForm() {
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-slate-600">Your name</label>
+        <label className="block text-xs font-medium text-slate-600">
+          Your name <span className="text-brand-coral">*</span>
+        </label>
         <input
           name="name"
           required
@@ -38,7 +40,9 @@ export function ContactForm() {
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-slate-600">Your email</label>
+        <label className="block text-xs font-medium text-slate-600">
+          Your email <span className="text-brand-coral">*</span>
+        </label>
         <input
           name="email"
           type="email"
@@ -51,7 +55,9 @@ export function ContactForm() {
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-slate-600">Message</label>
+        <label className="block text-xs font-medium text-slate-600">
+          Message <span className="text-brand-coral">*</span>
+        </label>
         <textarea
           name="message"
           rows={5}
