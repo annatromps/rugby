@@ -12,6 +12,7 @@ import { requireAdmin } from "@/lib/auth/dal";
 import { AddContactLogForm, ContactLogList } from "@/components/admin/contact-log";
 import { PlayerEditForm } from "./player-edit-form";
 import { PlayerPhotoUpload } from "@/components/admin/player-photo-upload";
+import { PlayerDocumentUpload } from "@/components/admin/player-document-upload";
 import { AccommodationList } from "./accommodation";
 
 export default async function PlayerDetailPage({
@@ -76,6 +77,21 @@ export default async function PlayerDetailPage({
 
       <Section title="Photo">
         <PlayerPhotoUpload playerId={player.id} photoUrl={player.photoUrl} />
+      </Section>
+
+      <Section title="Application documents">
+        <p className="mb-3 text-xs text-slate-500">
+          Staff only -- these are never shown on the public player profile.
+        </p>
+        <PlayerDocumentUpload
+          playerId={player.id}
+          passportUrl={player.passportUrl}
+          passportFileName={player.passportFileName}
+          cvUrl={player.cvUrl}
+          cvFileName={player.cvFileName}
+          coverLetterUrl={player.coverLetterUrl}
+          coverLetterFileName={player.coverLetterFileName}
+        />
       </Section>
 
       <Section title="Details">

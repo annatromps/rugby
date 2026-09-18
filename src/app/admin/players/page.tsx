@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { and, count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, isNull, or } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { players, emailTemplates } from "@/lib/db/schema";
 import { PlayerStatusSelect } from "@/components/admin/player-status-select";
@@ -12,12 +12,14 @@ import { RECORD_STATUSES } from "@/lib/constants";
 export default async function PlayersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; pending?: string }>;
+  searchParams: Promise<{ status?: string; pending?: string; docs?: string }>;
 }) {
-  const { status, pending } = await searchParams;
+  const { status, pending, docs } = await searchParams;
   const showPendingOnly = pending === "1";
+  const showMissingDocs = docs === "missing";
+  const missingDocsFilter = or(isNull(players.passportUrl), isNull(players.cvUrl), isNull(players.coverLetterUrl));
 
-  const [admin, rows, [pendingCountRow], playerTemplates] = await Promise.all([
+  const [admin, rows, [pendingCountRow], [missingDocsCountRow], playerTemplates] = await Promise.all([
     requireAdmin(),
     db
       .select()
@@ -25,18 +27,22 @@ export default async function PlayersPage({
       .where(
         showPendingOnly
           ? and(eq(players.source, "SELF_SUBMITTED"), eq(players.isPublished, false))
-          : status
-            ? eq(players.status, status as (typeof RECORD_STATUSES)[number])
-            : undefined,
+          : showMissingDocs
+            ? missingDocsFilter
+            : status
+              ? eq(players.status, status as (typeof RECORD_STATUSES)[number])
+              : undefined,
       )
       .orderBy(desc(players.updatedAt)),
     db
       .select({ value: count() })
       .from(players)
       .where(and(eq(players.source, "SELF_SUBMITTED"), eq(players.isPublished, false))),
+    db.select({ value: count() }).from(players).where(missingDocsFilter),
     db.select().from(emailTemplates).where(eq(emailTemplates.targetType, "PLAYER")),
   ]);
   const pendingCount = pendingCountRow?.value ?? 0;
+  const missingDocsCount = missingDocsCountRow?.value ?? 0;
 
   return (
     <div className="space-y-4">
@@ -72,7 +78,7 @@ export default async function PlayersPage({
         <Link
           href="/admin/players"
           className={`rounded-full px-3 py-1 text-xs font-medium ${
-            !status && !showPendingOnly ? "bg-brand-navy text-white" : "bg-white text-slate-600 border border-slate-200"
+            !status && !showPendingOnly && !showMissingDocs ? "bg-brand-navy text-white" : "bg-white text-slate-600 border border-slate-200"
           }`}
         >
           All
@@ -85,12 +91,20 @@ export default async function PlayersPage({
         >
           Pending review{pendingCount > 0 ? ` (${pendingCount})` : ""}
         </Link>
+        <Link
+          href="/admin/players?docs=missing"
+          className={`rounded-full px-3 py-1 text-xs font-medium ${
+            showMissingDocs ? "bg-slate-700 text-white" : "bg-white text-slate-600 border border-slate-200"
+          }`}
+        >
+          Missing documents{missingDocsCount > 0 ? ` (${missingDocsCount})` : ""}
+        </Link>
         {RECORD_STATUSES.map((s) => (
           <Link
             key={s}
             href={`/admin/players?status=${s}`}
             className={`rounded-full px-3 py-1 text-xs font-medium ${
-              !showPendingOnly && status === s ? "bg-brand-navy text-white" : "bg-white text-slate-600 border border-slate-200"
+              !showPendingOnly && !showMissingDocs && status === s ? "bg-brand-navy text-white" : "bg-white text-slate-600 border border-slate-200"
             }`}
           >
             {s.replace("_", " ").toLowerCase()}
@@ -105,6 +119,7 @@ export default async function PlayersPage({
               <th className="px-4 py-3 font-medium">Player</th>
               <th className="px-4 py-3 font-medium">Position</th>
               <th className="px-4 py-3 font-medium">Based in</th>
+              <th className="px-4 py-3 font-medium">Documents</th>
               <th className="px-4 py-3 font-medium">Accommodation</th>
               <th className="px-4 py-3 font-medium">Published</th>
               <th className="px-4 py-3 font-medium">Status</th>
@@ -114,9 +129,11 @@ export default async function PlayersPage({
           <tbody className="divide-y divide-slate-100">
             {rows.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-sm text-slate-400">
+                <td colSpan={8} className="px-4 py-8 text-center text-sm text-slate-400">
                   {showPendingOnly ? (
                     "Nothing waiting for review right now."
+                  ) : showMissingDocs ? (
+                    "Everyone has their documents on file."
                   ) : (
                     <>
                       No players yet.{" "}
@@ -138,6 +155,9 @@ export default async function PlayersPage({
                 </td>
                 <td className="px-4 py-3 text-slate-600">{player.position}</td>
                 <td className="px-4 py-3 text-slate-600">{player.currentCountry ?? "—"}</td>
+                <td className="px-4 py-3">
+                  <DocumentsBadge player={player} />
+                </td>
                 <td className="px-4 py-3 text-slate-500 text-xs">
                   {player.needsAccommodation ? "Needs help" : "—"}
                 </td>
@@ -161,5 +181,24 @@ export default async function PlayersPage({
         </table>
       </div>
     </div>
+  );
+}
+
+function DocumentsBadge({
+  player,
+}: {
+  player: { passportUrl: string | null; cvUrl: string | null; coverLetterUrl: string | null };
+}) {
+  const total = 3;
+  const have = [player.passportUrl, player.cvUrl, player.coverLetterUrl].filter(Boolean).length;
+  const complete = have === total;
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+        complete ? "bg-emerald-50 text-emerald-700" : have === 0 ? "bg-slate-100 text-slate-500" : "bg-amber-50 text-amber-700"
+      }`}
+    >
+      {have}/{total}
+    </span>
   );
 }

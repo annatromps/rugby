@@ -7,6 +7,8 @@ import { PLAYER_LEVELS, PLAYER_LEVEL_LABELS } from "@/lib/constants";
 const inputClass =
   "mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-navy focus:outline-none focus:ring-1 focus:ring-brand-navy";
 const labelClass = "block text-sm font-medium text-slate-700";
+const fileInputClass =
+  "mt-1 block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200";
 
 export function PlayerApplicationForm() {
   const [state, action, pending] = useActionState(submitPlayerApplication, undefined);
@@ -120,6 +122,28 @@ export function PlayerApplicationForm() {
         <input name="needsAccommodation" type="checkbox" className="rounded border-slate-300" />
         I&apos;d need help finding accommodation if placed abroad
       </label>
+
+      <div className="space-y-3 border-t border-slate-100 pt-4">
+        <div>
+          <p className="text-sm font-medium text-slate-700">Application documents (optional)</p>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Adding these now speeds up your review -- clubs never see them, they&apos;re only for our team.
+            PDF, JPG, PNG, or WEBP, up to 10MB each.
+          </p>
+        </div>
+        <div>
+          <label className={labelClass}>Passport / ID</label>
+          <input name="passport" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" className={fileInputClass} />
+        </div>
+        <div>
+          <label className={labelClass}>CV</label>
+          <input name="cv" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" className={fileInputClass} />
+        </div>
+        <div>
+          <label className={labelClass}>Cover letter</label>
+          <input name="coverLetter" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" className={fileInputClass} />
+        </div>
+      </div>
 
       {state && "error" in state && state.error && <p className="text-sm text-red-600">{state.error}</p>}
 

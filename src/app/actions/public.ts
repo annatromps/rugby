@@ -19,6 +19,8 @@ import { players, clubs, coaches, positionNeeds, contactLogs } from "@/lib/db/sc
 import { PLAYER_LEVELS } from "@/lib/constants";
 import { optionalEnum } from "@/lib/validation";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { uploadDocumentFile } from "@/app/actions/documents";
+import { validateDocument } from "@/lib/document-validation";
 
 export type PublicFormState =
   | { success: true }
@@ -69,11 +71,41 @@ export async function submitPlayerApplication(
     return { fieldErrors: parsed.error.flatten().fieldErrors };
   }
 
+  // Passport/CV/cover letter are optional here -- a player can add them
+  // now or an admin can chase them down and upload later from the admin
+  // player page (see src/app/actions/documents.ts). Only validate a slot
+  // if something was actually chosen for it.
+  const documentFields = [
+    { key: "passport", file: formData.get("passport") as File | null },
+    { key: "cv", file: formData.get("cv") as File | null },
+    { key: "coverLetter", file: formData.get("coverLetter") as File | null },
+  ] as const;
+
+  for (const { file } of documentFields) {
+    if (file && file.size > 0) {
+      const error = validateDocument(file);
+      if (error) return { error };
+    }
+  }
+
+  const uploads: Record<string, { url: string; fileName: string }> = {};
+  for (const { key, file } of documentFields) {
+    if (file && file.size > 0) {
+      uploads[key] = await uploadDocumentFile(key, file);
+    }
+  }
+
   await db.insert(players).values({
     ...parsed.data,
     source: "SELF_SUBMITTED",
     status: "NEW",
     isPublished: false,
+    passportUrl: uploads.passport?.url,
+    passportFileName: uploads.passport?.fileName,
+    cvUrl: uploads.cv?.url,
+    cvFileName: uploads.cv?.fileName,
+    coverLetterUrl: uploads.coverLetter?.url,
+    coverLetterFileName: uploads.coverLetter?.fileName,
   });
 
   revalidatePath("/admin/players");
