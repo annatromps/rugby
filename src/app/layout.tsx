@@ -10,7 +10,7 @@ import "./globals.css";
 // every platform -- a good tradeoff for an admin tool. If you want a brand
 // typeface later, self-host it with next/font/local instead.
 
-const SITE_URL = "https://rugby-snowy.vercel.app"; // update once a custom domain is live
+const SITE_URL = "https://kickoff-rugby.vercel.app"; // update once a custom domain is live
 const SITE_DESCRIPTION =
   "Where rugby players and clubs find each other. Browse players, browse clubs, and connect directly.";
 
@@ -22,20 +22,21 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   icons: {
-    icon: "/kickoff-rugby-logo.png",
+    icon: "/kickoff-rugby-favicon.png",
+    apple: "/kickoff-rugby-favicon.png",
   },
   openGraph: {
     type: "website",
     siteName: "Kickoff Rugby Recruitment",
     title: "Kickoff Rugby Recruitment",
     description: SITE_DESCRIPTION,
-    images: [{ url: "/kickoff-rugby-logo.png", width: 176, height: 69 }],
+    images: [{ url: "/kickoff-rugby-og.png", width: 1200, height: 630 }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Kickoff Rugby Recruitment",
     description: SITE_DESCRIPTION,
-    images: ["/kickoff-rugby-logo.png"],
+    images: ["/kickoff-rugby-og.png"],
   },
 };
 

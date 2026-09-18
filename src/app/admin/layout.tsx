@@ -20,15 +20,18 @@ export default async function AdminLayout({
     <div className="min-h-screen bg-slate-50">
       <div className="flex">
         <aside className="hidden w-56 shrink-0 border-r border-slate-200 bg-white sm:flex sm:flex-col">
-          <Link href="/admin" className="flex h-16 items-center gap-2 border-b border-slate-200 px-4">
+          <Link href="/admin" className="flex h-16 items-center gap-2.5 border-b border-slate-200 px-4">
             <Image
-              src="/kickoff-rugby-logo.png"
+              src="/kickoff-rugby-favicon.png"
               alt="Kickoff Rugby Recruitment"
-              width={176}
-              height={69}
+              width={512}
+              height={512}
               priority
-              className="h-8 w-auto"
+              className="h-9 w-9 rounded-md"
             />
+            <span className="text-sm font-extrabold uppercase leading-tight tracking-tight text-brand-navy">
+              Kickoff Rugby
+            </span>
           </Link>
           <AdminNav className="flex-1 p-3" />
           <div className="border-t border-slate-100 p-3">

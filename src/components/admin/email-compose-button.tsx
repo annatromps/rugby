@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { renderTemplate } from "@/lib/email-templates";
 
 type TemplateOption = { id: string; name: string; subject: string; body: string; isDefault: boolean };
@@ -31,6 +31,32 @@ export function EmailComposeButton({
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [copied, setCopied] = useState<"subject" | "body" | null>(null);
+  const [emailMenuOpen, setEmailMenuOpen] = useState(false);
+  const emailMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleOutsideClick(e: MouseEvent) {
+      if (emailMenuRef.current && !emailMenuRef.current.contains(e.target as Node)) {
+        setEmailMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+  const mailtoHref = `mailto:${encodeURIComponent(recipientEmail ?? "")}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const gmailHref = `https://mail.google.com/mail/?${new URLSearchParams({
+    view: "cm",
+    fs: "1",
+    to: recipientEmail ?? "",
+    su: subject,
+    body,
+  }).toString()}`;
+  const outlookHref = `https://outlook.live.com/mail/0/deeplink/compose?${new URLSearchParams({
+    to: recipientEmail ?? "",
+    subject,
+    body,
+  }).toString()}`;
 
   function openModal() {
     const tpl = templates.find((t) => t.id === templateId) ?? defaultTemplate;
@@ -128,13 +154,57 @@ export function EmailComposeButton({
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <a
-                href={`mailto:${encodeURIComponent(recipientEmail ?? "")}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`}
-                onClick={() => setOpen(false)}
-                className="rounded-md bg-brand-navy px-3 py-2 text-sm font-semibold text-white hover:bg-brand-navy-dark"
-              >
-                Open in email app
-              </a>
+              <div ref={emailMenuRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setEmailMenuOpen((v) => !v)}
+                  aria-expanded={emailMenuOpen}
+                  className="inline-flex items-center gap-1.5 rounded-md bg-brand-navy px-3 py-2 text-sm font-semibold text-white hover:bg-brand-navy-dark"
+                >
+                  Open in email app
+                  <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="M5 8l5 5 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+                {emailMenuOpen && (
+                  <div className="absolute bottom-full left-0 z-10 mb-1 w-48 rounded-md border border-slate-200 bg-white py-1 shadow-lg">
+                    <a
+                      href={gmailHref}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      onClick={() => {
+                        setEmailMenuOpen(false);
+                        setOpen(false);
+                      }}
+                      className="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                    >
+                      Gmail
+                    </a>
+                    <a
+                      href={outlookHref}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      onClick={() => {
+                        setEmailMenuOpen(false);
+                        setOpen(false);
+                      }}
+                      className="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                    >
+                      Outlook.com
+                    </a>
+                    <a
+                      href={mailtoHref}
+                      onClick={() => {
+                        setEmailMenuOpen(false);
+                        setOpen(false);
+                      }}
+                      className="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                    >
+                      Default mail app
+                    </a>
+                  </div>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={() => {

@@ -47,7 +47,7 @@ function MoreMenu() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label="More"
-        className="flex items-center gap-1 rounded-md px-2.5 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-brand-navy"
+        className="flex items-center gap-1 rounded-md px-2.5 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white"
       >
         <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
           <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
@@ -82,7 +82,7 @@ function SignUpMenu() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="whitespace-nowrap rounded-md border border-brand-navy px-2.5 py-1.5 text-sm font-semibold text-brand-navy hover:bg-brand-navy hover:text-white"
+        className="whitespace-nowrap rounded-md bg-brand-coral px-2.5 py-1.5 text-sm font-semibold text-white hover:bg-brand-coral-dark"
       >
         Sign up
       </button>
@@ -106,17 +106,20 @@ function SignUpMenu() {
 
 export function SiteHeaderNav({ accountName }: { accountName: string | null }) {
   return (
-    <header className="border-b border-slate-200 bg-white">
+    <header className="border-b border-white/10 bg-brand-navy">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <Link href="/" className="shrink-0">
+        <Link href="/" className="flex shrink-0 items-center gap-2.5">
           <Image
-            src="/kickoff-rugby-logo.png"
+            src="/kickoff-rugby-icon.png"
             alt="Kickoff Rugby Recruitment"
-            width={176}
-            height={69}
+            width={600}
+            height={377}
             priority
-            className="h-9 w-auto sm:h-10"
+            className="h-8 w-auto sm:h-9"
           />
+          <span className="hidden text-base font-extrabold uppercase tracking-tight text-white sm:inline">
+            Kickoff Rugby
+          </span>
         </Link>
 
         <nav className="flex flex-1 items-center gap-1 sm:gap-2">
@@ -124,7 +127,7 @@ export function SiteHeaderNav({ accountName }: { accountName: string | null }) {
             <Link
               key={link.href}
               href={link.href}
-              className="whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-brand-navy"
+              className="whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white"
             >
               {link.label}
             </Link>
@@ -133,16 +136,16 @@ export function SiteHeaderNav({ accountName }: { accountName: string | null }) {
 
         <div className="flex shrink-0 items-center gap-2">
           <MoreMenu />
-          <span className="h-6 w-px bg-slate-200" aria-hidden="true" />
+          <span className="h-6 w-px bg-white/20" aria-hidden="true" />
           {accountName ? (
             <>
-              <span className="hidden whitespace-nowrap text-sm text-slate-600 sm:inline">
+              <span className="hidden whitespace-nowrap text-sm text-slate-300 sm:inline">
                 Hi, {accountName.split(" ")[0]}
               </span>
               <form action={logOutAccount}>
                 <button
                   type="submit"
-                  className="whitespace-nowrap rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                  className="whitespace-nowrap rounded-md border border-white/25 px-2.5 py-1.5 text-sm font-medium text-white hover:bg-white/10"
                 >
                   Log out
                 </button>
@@ -152,7 +155,7 @@ export function SiteHeaderNav({ accountName }: { accountName: string | null }) {
             <>
               <Link
                 href="/signin"
-                className="whitespace-nowrap rounded-md px-2 py-1.5 text-sm font-medium text-slate-600 hover:text-brand-navy"
+                className="whitespace-nowrap rounded-md px-2 py-1.5 text-sm font-medium text-slate-300 hover:text-white"
               >
                 Log in
               </Link>
