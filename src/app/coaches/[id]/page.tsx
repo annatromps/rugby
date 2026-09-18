@@ -76,14 +76,14 @@ export default async function CoachProfilePage({
             <div className="flex flex-wrap items-center gap-4">
               <Avatar
                 src={canReveal ? coach.photoUrl : null}
-                alt={loggedIn ? fullName : "Rugby coach"}
+                alt={canReveal ? fullName : "Rugby coach"}
                 initials={`${coach.firstName[0] ?? ""}${coach.lastName[0] ?? ""}`}
-                anonymous={!loggedIn}
+                anonymous={!canReveal}
                 size={72}
               />
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className={loggedIn ? "text-2xl font-bold text-slate-900" : "text-2xl font-medium italic text-slate-400"}>
-                  {loggedIn ? fullName : "Sign in to see name"}
+                <h1 className={canReveal ? "text-2xl font-bold text-slate-900" : "text-2xl font-medium italic text-slate-400"}>
+                  {canReveal ? fullName : "Sign in to see name"}
                 </h1>
                 {coach.isVerified && <VerifiedBadge />}
               </div>

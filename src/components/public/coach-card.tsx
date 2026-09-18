@@ -22,12 +22,12 @@ export function CoachCard({ coach, loggedIn }: { coach: Coach; loggedIn: boolean
         <div className="flex items-center gap-3">
           <Avatar
             src={canReveal ? coach.photoUrl : null}
-            alt={loggedIn ? fullName : "Rugby coach"}
+            alt={canReveal ? fullName : "Rugby coach"}
             initials={`${coach.firstName[0] ?? ""}${coach.lastName[0] ?? ""}`}
-            anonymous={!loggedIn}
+            anonymous={!canReveal}
             size={44}
           />
-          {loggedIn ? (
+          {canReveal ? (
             <h3 className="flex items-center gap-2 font-semibold text-slate-900">
               {fullName}
               {coach.isVerified && <VerifiedBadge />}

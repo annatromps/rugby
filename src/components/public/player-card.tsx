@@ -23,12 +23,12 @@ export function PlayerCard({ player, loggedIn }: { player: Player; loggedIn: boo
         <div className="flex items-center gap-3">
           <Avatar
             src={canReveal ? player.photoUrl : null}
-            alt={loggedIn ? fullName : "Rugby player"}
+            alt={canReveal ? fullName : "Rugby player"}
             initials={`${player.firstName[0] ?? ""}${player.lastName[0] ?? ""}`}
-            anonymous={!loggedIn}
+            anonymous={!canReveal}
             size={44}
           />
-          {loggedIn ? (
+          {canReveal ? (
             <h3 className="flex items-center gap-2 font-semibold text-slate-900">
               {fullName}
               {player.isVerified && <VerifiedBadge />}
