@@ -1,49 +1,27 @@
 "use client";
 
-import Link from "next/link";
 import { useActionState, useState } from "react";
-import { logInAccount } from "@/app/actions/portal-auth";
+import { resetPassword } from "@/app/actions/password-reset";
 
-export function SignInForm() {
-  const [state, action, pending] = useActionState(logInAccount, undefined);
+export function ResetPasswordForm({ token }: { token: string }) {
+  const [state, action, pending] = useActionState(resetPassword, undefined);
   const [showPassword, setShowPassword] = useState(false);
-  const rememberedEmail = state && "email" in state ? state.email : undefined;
 
   return (
     <form action={action} className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <input type="hidden" name="token" value={token} />
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-slate-700">
-          Email
+        <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+          New password
         </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-          defaultValue={rememberedEmail}
-          className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-navy focus:outline-none focus:ring-1 focus:ring-brand-navy"
-        />
-        {state && "fieldErrors" in state && state.fieldErrors?.email && (
-          <p className="mt-1 text-xs text-red-600">{state.fieldErrors.email[0]}</p>
-        )}
-      </div>
-      <div>
-        <div className="flex items-center justify-between">
-          <label htmlFor="password" className="block text-sm font-medium text-slate-700">
-            Password
-          </label>
-          <Link href="/forgot-password" className="text-xs font-medium text-slate-500 hover:text-brand-navy">
-            Forgot password?
-          </Link>
-        </div>
         <div className="relative mt-1">
           <input
             id="password"
             name="password"
             type={showPassword ? "text" : "password"}
-            autoComplete="current-password"
+            autoComplete="new-password"
             required
+            minLength={8}
             className="block w-full rounded-md border border-slate-300 px-3 py-2 pr-10 text-sm focus:border-brand-navy focus:outline-none focus:ring-1 focus:ring-brand-navy"
           />
           <button
@@ -65,9 +43,21 @@ export function SignInForm() {
             )}
           </button>
         </div>
-        {state && "fieldErrors" in state && state.fieldErrors?.password && (
-          <p className="mt-1 text-xs text-red-600">{state.fieldErrors.password[0]}</p>
-        )}
+        <p className="mt-1 text-xs text-slate-500">At least 8 characters.</p>
+      </div>
+      <div>
+        <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700">
+          Confirm new password
+        </label>
+        <input
+          id="confirmPassword"
+          name="confirmPassword"
+          type={showPassword ? "text" : "password"}
+          autoComplete="new-password"
+          required
+          minLength={8}
+          className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-navy focus:outline-none focus:ring-1 focus:ring-brand-navy"
+        />
       </div>
       {state && "error" in state && <p className="text-sm text-red-600">{state.error}</p>}
       <button
@@ -75,14 +65,8 @@ export function SignInForm() {
         disabled={pending}
         className="w-full rounded-md bg-brand-navy px-3 py-2 text-sm font-semibold text-white hover:bg-brand-navy-dark disabled:opacity-60"
       >
-        {pending ? "Logging in..." : "Log in"}
+        {pending ? "Saving..." : "Reset password"}
       </button>
-      <p className="text-center text-xs text-slate-500">
-        Don&rsquo;t have an account?{" "}
-        <Link href="/signup" className="font-medium text-brand-navy hover:underline">
-          Sign up
-        </Link>
-      </p>
     </form>
   );
 }

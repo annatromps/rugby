@@ -42,6 +42,10 @@ export const accounts = pgTable("accounts", {
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  // Forgot-password flow: a random token + expiry set when a reset email is
+  // sent, cleared once used. Null most of the time.
+  resetToken: text("reset_token"),
+  resetTokenExpiresAt: timestamp("reset_token_expires_at"),
 });
 
 // ---------- Admin ----------
@@ -56,6 +60,10 @@ export const adminUsers = pgTable("admin_users", {
   role: adminRoleEnum("role").notNull().default("STAFF"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  // Forgot-password flow: a random token + expiry set when a reset email is
+  // sent, cleared once used. Null most of the time.
+  resetToken: text("reset_token"),
+  resetTokenExpiresAt: timestamp("reset_token_expires_at"),
 });
 
 // ---------- Shared enums ----------
@@ -142,13 +150,25 @@ export const players = pgTable("players", {
   lastName: text("last_name").notNull(),
   email: text("email"),
   phone: text("phone"),
-  nationality: text("nationality"),
+  nationality: text("nationality"), // free text; comma-separate if more than one
   currentCountry: text("current_country"),
+  desiredCountry: text("desired_country"), // where they'd like to move/play
   position: text("position").notNull(), // primary playing position
   secondaryPosition: text("secondary_position"),
   // Headshot, uploaded by an admin via Vercel Blob. Shown on the public
   // player card and profile page; null shows a plain initials fallback.
   photoUrl: text("photo_url"),
+  // Application documents, uploaded to Vercel Blob (see
+  // src/app/actions/documents.ts). These are ADMIN-ONLY: never rendered on
+  // any public page (a passport scan and a CV are sensitive/personal), only
+  // on the admin player detail page. File name columns exist purely so the
+  // admin sees "passport.pdf" instead of a raw blob URL.
+  passportUrl: text("passport_url"),
+  passportFileName: text("passport_file_name"),
+  cvUrl: text("cv_url"),
+  cvFileName: text("cv_file_name"),
+  coverLetterUrl: text("cover_letter_url"),
+  coverLetterFileName: text("cover_letter_file_name"),
   level: playerLevelEnum("level"),
   currentClub: text("current_club"), // free-text, may not be in our clubs table
   yearsExperience: integer("years_experience"),
