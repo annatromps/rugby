@@ -71,20 +71,23 @@ export default async function HomePage() {
               academies.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              {/* These read as "sign me up", so they go straight to the join
+                  form for that persona -- browsing the existing directory
+                  is still one click away via the nav bar above. */}
               <Link
-                href="/players"
+                href="/join/player"
                 className="w-full rounded-md bg-white px-5 py-3 text-sm font-semibold text-brand-navy shadow-sm hover:bg-slate-100 sm:w-auto"
               >
                 I&rsquo;m a player
               </Link>
               <Link
-                href="/coaches"
+                href="/join/coach"
                 className="w-full rounded-md bg-white px-5 py-3 text-sm font-semibold text-brand-navy shadow-sm hover:bg-slate-100 sm:w-auto"
               >
                 I&rsquo;m a coach
               </Link>
               <Link
-                href="/clubs"
+                href="/join/club"
                 className="w-full rounded-md bg-brand-coral px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brand-coral-dark sm:w-auto"
               >
                 I represent a club
