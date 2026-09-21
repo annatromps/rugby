@@ -88,8 +88,14 @@ see README.md's Deploying section.
 
 ## Not yet built (see README.md's "Current scope")
 
-Email notifications, photo uploads, a self-serve accommodation request
-flow, and monetization are all deliberately not built yet -- each needs
-either a product/business decision or a new third-party service account
-before work on it should start. Don't build workarounds for these
-without checking first.
+Automated email notifications (e.g. notifying an admin of a new
+sign-up, or a player of a status change -- staff can still manually
+email someone via the Email button on their detail page), a self-serve
+accommodation request flow, self-serve messaging between users, and
+monetization are all deliberately not built yet -- each needs either a
+product/business decision or a new third-party service account before
+work on it should start. Don't build workarounds for these without
+checking first.
+
+Photo uploads and application document uploads (passport/CV/cover
+letter, admin-only, see src/app/actions/documents.ts) are both built.
