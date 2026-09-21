@@ -111,6 +111,6 @@ If this project is ever transferred to a new owner, the cleanest handover is: a 
 
 - No payments or monetization -- if that's added, it's a business-model decision first, not just a build task.
 - Accommodation support (`accommodation_requests` table) is tracked but not automated -- it's a log an admin updates by hand; there's no player-facing request flow yet.
-- Resend is configured (`RESEND_API_KEY` set in Vercel), but there's no forgot-password flow or other transactional email built on top of it yet. Note Resend also needs a verified sending domain before it can email real site users, not just the account owner.
+- Forgot-password email is built and working (see `src/app/actions/password-reset.ts`), but Resend has no verified sending domain yet, so it can currently only deliver to the address the Resend account itself was signed up with -- a real user resetting their password elsewhere will silently get no email. Verifying a domain in Resend (a few DNS records) unblocks this for real users.
 - No self-serve login/inbox messaging system yet for players, coaches and clubs to message each other directly -- the `conversations`/`messages` tables exist but no UI is built on them.
 - No privacy policy / terms of service pages yet, despite the public forms collecting personal data (email, phone, sometimes nationality). Worth prioritizing before traffic scales up.

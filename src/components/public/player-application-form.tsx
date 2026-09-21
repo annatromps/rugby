@@ -145,6 +145,18 @@ export function PlayerApplicationForm() {
         </div>
       </div>
 
+      <p className="text-xs text-slate-500">
+        By submitting, you agree to our{" "}
+        <a href="/terms" target="_blank" rel="noreferrer noopener" className="underline hover:text-slate-700">
+          Terms of service
+        </a>{" "}
+        and{" "}
+        <a href="/privacy" target="_blank" rel="noreferrer noopener" className="underline hover:text-slate-700">
+          Privacy policy
+        </a>
+        .
+      </p>
+
       {state && "error" in state && state.error && <p className="text-sm text-red-600">{state.error}</p>}
 
       <button

@@ -52,6 +52,12 @@ export function SiteFooter() {
           <Link href="/login" className="hover:text-brand-coral">
             Staff login
           </Link>
+          <Link href="/privacy" className="hover:text-brand-coral">
+            Privacy
+          </Link>
+          <Link href="/terms" className="hover:text-brand-coral">
+            Terms
+          </Link>
         </div>
       </div>
     </footer>
